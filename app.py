@@ -69,28 +69,6 @@ def load_and_clean_data():
     df['Year'] = df['Year'].astype(int)
     
     return df
-# ----------------------------------------------------
-# NEW FUNCTION: CACHED GEMINI ANALYSIS ENGINE
-# ----------------------------------------------------
-@st.cache_data(show_spinner=False)
-def get_cached_ai_analysis(api_key, prompt):
-    try:
-        client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model='gemini-3.7-flash', 
-            contents=prompt,
-            config=genai.types.GenerateContentConfig(
-                thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
-            )
-        )
-        return response.text
-    except Exception as e:
-        return f"Error connecting to the scouting network: {str(e)}"
-
-df_clean = load_and_clean_data()
-
-if df_clean.empty:
-    st.stop()
 
 # ----------------------------------------------------
 # 2. SIDEBAR NAVIGATION & FILTERS
