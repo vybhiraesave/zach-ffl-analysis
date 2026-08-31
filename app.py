@@ -189,7 +189,7 @@ elif view_option == "Manager Spending Habits":
             linewidth=3,
             ax=ax
         )
-        ax.set_title(f'{selected_manager}: Budget Spent vs Market Value ({selected_position})', fontsize=12, fontweight='bold', color=EAGLES_GREEN)
+        ax.set_title(f'{selected_manager}: Budget Spent vs Market Value ({selected_position})', fontsize=12, fontweight='bold')
         ax.set_xlabel('Year')
         ax.set_ylabel('Total Cap Percentage (%)')
         plt.xticks(all_years)
@@ -285,7 +285,7 @@ elif view_option == "Draft Position Lulls":
                 f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
             )
             with st.spinner("Analyzing drafting waves and valleys..."):
-                response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+                response = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
                 st.write(response.text)
         except Exception as e:
             st.error(f"Could not load AI draft analysis: {str(e)}")
@@ -376,7 +376,7 @@ elif view_option == "Player Market Value":
                 f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
             )
             with st.spinner("Auditing individual player transaction ledgers..."):
-                response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+                response = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
                 st.write(response.text)
         except Exception as e:
             st.error(f"Could not load player price audit: {str(e)}")
