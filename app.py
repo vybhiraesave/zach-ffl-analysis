@@ -51,29 +51,27 @@ all_managers = sorted(df_clean['Manager'].unique())
 # ----------------------------------------------------
 # 3. RISK-PROOF GEMINI ENGINE WITH STABLE 1.5 FALLBACK
 # ----------------------------------------------------
+# ----------------------------------------------------
+# 3. CLEAN ONLY-SUCCESS CACHED ENGINE
+# ----------------------------------------------------
 @st.cache_data(show_spinner=False)
-def get_cached_ai_analysis(api_key, prompt):
+def get_cached_ai_analysis(api_key, model_name, prompt, model_type="3.7"):
     client = genai.Client(api_key=api_key)
-    try:
+    if model_type == "3.7":
         response = client.models.generate_content(
-            model='gemini-3.7-flash', 
+            model=model_name, 
             contents=prompt,
             config=genai.types.GenerateContentConfig(
                 thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
             )
         )
-        return response.text
-    except Exception as e:
-        if "503" in str(e) or "UNAVAILABLE" in str(e):
-            try:
-                fallback_response = client.models.generate_content(
-                    model='gemini-1.5-flash',
-                    contents=prompt + " (Note: Keep this analysis highly focused and concise.)"
-                )
-                return f"⚠️ *Note: Primary server is busy. Switched to back-up stable 1.5 scout.* \n\n{fallback_response.text}"
-            except Exception as fallback_error:
-                return "The scouting network is completely congested right now. Please clear cache and try again."
-        return f"Scouting report interrupted: {str(e)}"
+    else:
+        response = client.models.generate_content(
+            model=model_name, 
+            contents=prompt
+        )
+    return response.text
+
 
 # ----------------------------------------------------
 # 4. SIDEBAR NAVIGATION
@@ -239,10 +237,25 @@ elif view_option == "Manager Spending Habits":
             )
             
             with st.spinner("Analyzing high-stakes Superflex market patterns..."):
-                analysis_text = get_cached_ai_analysis(api_key, prompt)
-                st.write(analysis_text)
+                try:
+                    # Attempt primary flagship model
+                    analysis_text = get_cached_ai_analysis(api_key, 'gemini-3.7-flash', prompt, "3.7")
+                    st.write(analysis_text)
+                except Exception as primary_err:
+                    # If 503 hit, instantly execute live uncached stable 1.5 backup check
+                    if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err):
+                        client_backup = genai.Client(api_key=api_key)
+                        fallback_response = client_backup.models.generate_content(
+                            model='gemini-1.5-flash',
+                            contents=prompt + " (Note: Keep this analysis highly focused and concise.)"
+                        )
+                        st.markdown("⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.*")
+                        st.write(fallback_response.text)
+                    else:
+                        st.error(f"Scouting report interrupted: {str(primary_err)}")
         except Exception as e:
             st.error(f"Scouting database connection error: {str(e)}")
+
 
     with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
@@ -297,10 +310,23 @@ elif view_option == "Draft Position Lulls":
                 f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
             )
             with st.spinner("Analyzing drafting waves and valleys..."):
-                analysis_text = get_cached_ai_analysis(api_key, prompt)
-                st.write(analysis_text)
+                try:
+                    analysis_text = get_cached_ai_analysis(api_key, 'gemini-3.7-flash', prompt, "3.7")
+                    st.write(analysis_text)
+                except Exception as primary_err:
+                    if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err):
+                        client_backup = genai.Client(api_key=api_key)
+                        fallback_response = client_backup.models.generate_content(
+                            model='gemini-1.5-flash',
+                            contents=prompt
+                        )
+                        st.markdown("⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.*")
+                        st.write(fallback_response.text)
+                    else:
+                        st.error(f"Could not load AI draft analysis: {str(primary_err)}")
         except Exception as e:
-            st.error(f"Could not load AI draft analysis: {str(e)}")
+            st.error(f"Data mapping error: {str(e)}")
+
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -384,9 +410,22 @@ elif view_option == "Player Market Value":
                 f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
             )
             with st.spinner("Auditing individual player transaction ledgers..."):
-                analysis_text = get_cached_ai_analysis(api_key, prompt)
-                st.write(analysis_text)
+                try:
+                    analysis_text = get_cached_ai_analysis(api_key, 'gemini-3.7-flash', prompt, "3.7")
+                    st.write(analysis_text)
+                except Exception as primary_err:
+                    if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err):
+                        client_backup = genai.Client(api_key=api_key)
+                        fallback_response = client_backup.models.generate_content(
+                            model='gemini-1.5-flash',
+                            contents=prompt
+                        )
+                        st.markdown("⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.*")
+                        st.write(fallback_response.text)
+                    else:
+                        st.error(f"Could not load player price audit: {str(primary_err)}")
         except Exception as e:
-            st.error(f"Could not load player price audit: {str(e)}")
+            st.error(f"Could not parse data rows: {str(e)}")
+
 
 
