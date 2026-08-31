@@ -4,4 +4,4 @@ numpy
 plotly
 seaborn
 matplotlib
-openai
+google-genai
