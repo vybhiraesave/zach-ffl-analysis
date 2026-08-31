@@ -91,9 +91,13 @@ if view_option == "Executive Blueprint (2026 Plan)":
     df_clean['Premium_Paid'] = df_clean['Cap_Percent'] - df_clean['Consensus_AAV_Cap_Percent']
     avg_premium_by_manager = df_clean.groupby('Manager')['Premium_Paid'].mean().reset_index()
     
-    most_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False).iloc['Manager']
-    biggest_bargain_hunter = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True).iloc['Manager']
+    # Fixed: Sorting first, then grabbing the string value out of the very first row [0]
+    sorted_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False)
+    most_aggressive = sorted_aggressive['Manager'].values[0]
     
+    sorted_bargains = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True)
+    biggest_bargain_hunter = sorted_bargains['Manager'].values[0]
+
     m1, m2, m3 = st.columns(3)
     with m1:
         st.metric(label="League Economy", value="10 Teams / $200 Cap", delta="Superflex (2 QB Config)")
