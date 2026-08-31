@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
-from openai import OpenAI
+from google import genai
 
 # Set page configuration
 st.set_page_config(
@@ -46,22 +46,19 @@ all_positions = sorted(df_clean['Position'].unique())
 all_managers = sorted(df_clean['Manager'].unique())
 
 # ----------------------------------------------------
-# 2. CACHED OPENAI INTEL ENGINE (Using gpt-4o-mini)
+# 2. STABLE HIGH-THROUGHPUT GEMINI INTEL ENGINE (Using 2.5-Flash)
 # ----------------------------------------------------
 @st.cache_data(show_spinner=False)
 def get_cached_ai_analysis(api_key, prompt):
     try:
-        client = OpenAI(api_key=api_key)
-        response = client.chat.completions.create(
-            model="gpt-4o-mini",
-            messages=[
-                {"role": "system", "content": "You are an elite high-stakes fantasy football auction draft strategist and economic ledger auditor."},
-                {"role": "user", "content": prompt}
-            ]
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model='gemini-2.5-flash', 
+            contents=prompt
         )
-        return response.choices[0].message.content
+        return response.text
     except Exception as e:
-        return f"Could not connect to OpenAI scouting network: {str(e)}"
+        return f"Could not connect to the scouting network: {str(e)}"
 
 # ----------------------------------------------------
 # 3. SIDEBAR NAVIGATION
@@ -84,7 +81,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
         st.markdown("""
         Welcome to the **Auction Analysis Engine**! This tool is engineered to break down your home league's historical trends (2021–2025) and help you exploit manager tendencies. Here is how to navigate the strategy room:
         *   **1. Executive Blueprint (Home Page):** View the lifetime capital ROI leaderboard to instantly pinpoint who overspends and who finds bargains. Review the custom multi-column tactical blueprint for the 2026 draft.
-        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **OpenAI Scouting Report** detailing their Superflex anomalies and how to beat them.
+        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **Gemini AI Scouting Report** detailing their Superflex anomalies and how to beat them.
         *   **3. Draft Position Lulls:** Toggle draft years to look at the historical flow of when positions fly off the board. Target the 'valleys' to secure players where market competition cools down.
         *   **4. Player Market Value:** Analyze individual asset pricing. Grouped horizontal bars let you compare actual league paid percentages directly against baseline market consensus values.
         """)
@@ -94,8 +91,8 @@ if view_option == "Executive Blueprint (2026 Plan)":
     df_clean['Premium_Paid'] = df_clean['Cap_Percent'] - df_clean['Consensus_AAV_Cap_Percent']
     avg_premium_by_manager = df_clean.groupby('Manager')['Premium_Paid'].mean().reset_index()
     
-    most_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False).iloc[0]['Manager']
-    biggest_bargain_hunter = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True).iloc[0]['Manager']
+    most_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False).iloc['Manager']
+    biggest_bargain_hunter = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True).iloc['Manager']
     
     m1, m2, m3 = st.columns(3)
     with m1:
@@ -206,16 +203,17 @@ elif view_option == "Manager Spending Habits":
         st.warning(f"No data available for {selected_manager} drafting {selected_position} positions.")
 
     st.markdown("---")
-    st.subheader(f"🧠 OpenAI Superflex Scouting Profile: {selected_manager}")
+    st.subheader(f"🤖 Gemini Superflex Scouting Profile: {selected_manager}")
     
-    api_key = st.secrets.get("OPENAI_API_KEY") or None
+    api_key = st.secrets.get("GEMINI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 Add your `OPENAI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
+        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
     else:
         try:
             data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
             prompt = (
+                f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
                 f"Deconstruct this multi-year positional data for manager '{selected_manager}' regarding the '{selected_position}' position.\n"
                 f"{data_summary_text}\n\n"
                 f"Write a comprehensive scouting report tailored for the 2026 draft. Your analysis must cover:\n"
@@ -263,18 +261,19 @@ elif view_option == "Draft Position Lulls":
     st.pyplot(fig)
 
     st.markdown("---")
-    st.subheader(f"🧠 OpenAI AI Draft Flow Assessment ({selected_year})")
+    st.subheader(f"🤖 Gemini AI Draft Flow Assessment ({selected_year})")
     
-    api_key = st.secrets.get("OPENAI_API_KEY") or None
+    api_key = st.secrets.get("GEMINI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 Add your `OPENAI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
+        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
     else:
         try:
             lull_summary = subset_year_df.groupby('Position')['Pick Number'].agg(['min', 'mean', 'max']).reset_index()
             data_summary_text = lull_summary.to_string(index=False)
             
             prompt = (
+                f"You are a fantasy football data scientist studying draft economy curves. "
                 f"Analyze these draft distribution stats for the year {selected_year} detailing the pick numbers when positions went off the board:\n"
                 f"{data_summary_text}\n\n"
                 f"Provide a 3-sentence macro summary of the draft room environment.\n"
@@ -345,12 +344,12 @@ elif view_option == "Player Market Value":
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
-    st.subheader(f"🧠 OpenAI Player Value Audit ({selected_year} - {selected_position}s)")
+    st.subheader(f"🤖 Gemini Player Value Audit ({selected_year} - {selected_position}s)")
     
-    api_key = st.secrets.get("OPENAI_API_KEY") or None
+    api_key = st.secrets.get("GEMINI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 Add your `OPENAI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
+        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
     else:
         try:
             audit_df = df_clean[(df_clean['Year'] == selected_year) & (df_clean['Position'] == selected_position)].copy()
@@ -360,6 +359,7 @@ elif view_option == "Player Market Value":
             top_bargains = audit_df.sort_values(by='Discrepancy', ascending=True).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
             
             prompt = (
+                f"You are a fantasy football financial ledger auditor reviewing an auction draft league. "
                 f"Analyze these top pricing anomalies for the position {selected_position} in the draft year {selected_year}.\n\n"
                 f"Top overpaid assets (Positive means they paid a huge premium above market value):\n{top_overpaid}\n\n"
                 f"Top bargain assets (Negative means they saved money below market value):\n{top_bargains}\n\n"
@@ -373,3 +373,5 @@ elif view_option == "Player Market Value":
                 st.write(analysis_text)
         except Exception as e:
             st.error(f"Could not load player price audit: {str(e)}")
+
+
