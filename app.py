@@ -4,7 +4,7 @@ import numpy as np
 import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
-from google import genai
+from openai import OpenAI
 
 # Set page configuration
 st.set_page_config(
@@ -38,9 +38,6 @@ def load_and_clean_data():
 
 df_clean = load_and_clean_data()
 
-# ----------------------------------------------------
-# 2. RUNTIME ERROR INSURANCE: LOCK IN VARIABLES
-# ----------------------------------------------------
 if df_clean.empty:
     st.stop()
 
@@ -49,32 +46,25 @@ all_positions = sorted(df_clean['Position'].unique())
 all_managers = sorted(df_clean['Manager'].unique())
 
 # ----------------------------------------------------
-# 3. RISK-PROOF GEMINI ENGINE WITH STABLE 1.5 FALLBACK
-# ----------------------------------------------------
-# ----------------------------------------------------
-# 3. CLEAN ONLY-SUCCESS CACHED ENGINE
+# 2. CACHED OPENAI INTEL ENGINE (Using gpt-4o-mini)
 # ----------------------------------------------------
 @st.cache_data(show_spinner=False)
-def get_cached_ai_analysis(api_key, model_name, prompt, model_type="3.7"):
-    client = genai.Client(api_key=api_key)
-    if model_type == "3.7":
-        response = client.models.generate_content(
-            model=model_name, 
-            contents=prompt,
-            config=genai.types.GenerateContentConfig(
-                thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
-            )
+def get_cached_ai_analysis(api_key, prompt):
+    try:
+        client = OpenAI(api_key=api_key)
+        response = client.chat.completions.create(
+            model="gpt-4o-mini",
+            messages=[
+                {"role": "system", "content": "You are an elite high-stakes fantasy football auction draft strategist and economic ledger auditor."},
+                {"role": "user", "content": prompt}
+            ]
         )
-    else:
-        response = client.models.generate_content(
-            model=model_name, 
-            contents=prompt
-        )
-    return response.text
-
+        return response.choices[0].message.content
+    except Exception as e:
+        return f"Could not connect to OpenAI scouting network: {str(e)}"
 
 # ----------------------------------------------------
-# 4. SIDEBAR NAVIGATION
+# 3. SIDEBAR NAVIGATION
 # ----------------------------------------------------
 st.sidebar.title("🏈 Auction Analysis Engine")
 st.sidebar.markdown("Analyzing historical draft inefficiencies to deliver a structural championship blueprint.")
@@ -94,7 +84,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
         st.markdown("""
         Welcome to the **Auction Analysis Engine**! This tool is engineered to break down your home league's historical trends (2021–2025) and help you exploit manager tendencies. Here is how to navigate the strategy room:
         *   **1. Executive Blueprint (Home Page):** View the lifetime capital ROI leaderboard to instantly pinpoint who overspends and who finds bargains. Review the custom multi-column tactical blueprint for the 2026 draft.
-        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **Gemini AI Scouting Report** detailing their Superflex anomalies and how to beat them.
+        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **OpenAI Scouting Report** detailing their Superflex anomalies and how to beat them.
         *   **3. Draft Position Lulls:** Toggle draft years to look at the historical flow of when positions fly off the board. Target the 'valleys' to secure players where market competition cools down.
         *   **4. Player Market Value:** Analyze individual asset pricing. Grouped horizontal bars let you compare actual league paid percentages directly against baseline market consensus values.
         """)
@@ -216,17 +206,16 @@ elif view_option == "Manager Spending Habits":
         st.warning(f"No data available for {selected_manager} drafting {selected_position} positions.")
 
     st.markdown("---")
-    st.subheader(f"🤖 Gemini Superflex Scouting Profile: {selected_manager}")
+    st.subheader(f"🧠 OpenAI Superflex Scouting Profile: {selected_manager}")
     
-    api_key = st.secrets.get("GEMINI_API_KEY") or None
+    api_key = st.secrets.get("OPENAI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
+        st.info("💡 Add your `OPENAI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
     else:
         try:
             data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
             prompt = (
-                f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
                 f"Deconstruct this multi-year positional data for manager '{selected_manager}' regarding the '{selected_position}' position.\n"
                 f"{data_summary_text}\n\n"
                 f"Write a comprehensive scouting report tailored for the 2026 draft. Your analysis must cover:\n"
@@ -237,25 +226,10 @@ elif view_option == "Manager Spending Habits":
             )
             
             with st.spinner("Analyzing high-stakes Superflex market patterns..."):
-                try:
-                    # Attempt primary flagship model
-                    analysis_text = get_cached_ai_analysis(api_key, 'gemini-3.7-flash', prompt, "3.7")
-                    st.write(analysis_text)
-                except Exception as primary_err:
-                    # If 503 hit, instantly execute live uncached stable 1.5 backup check
-                    if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err):
-                        client_backup = genai.Client(api_key=api_key)
-                        fallback_response = client_backup.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=prompt + " (Note: Keep this analysis highly focused and concise.)"
-                        )
-                        st.markdown("⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.*")
-                        st.write(fallback_response.text)
-                    else:
-                        st.error(f"Scouting report interrupted: {str(primary_err)}")
+                analysis_text = get_cached_ai_analysis(api_key, prompt)
+                st.write(analysis_text)
         except Exception as e:
             st.error(f"Scouting database connection error: {str(e)}")
-
 
     with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
@@ -289,19 +263,18 @@ elif view_option == "Draft Position Lulls":
     st.pyplot(fig)
 
     st.markdown("---")
-    st.subheader(f"🤖 Gemini AI Draft Flow Assessment ({selected_year})")
+    st.subheader(f"🧠 OpenAI AI Draft Flow Assessment ({selected_year})")
     
-    api_key = st.secrets.get("GEMINI_API_KEY") or None
+    api_key = st.secrets.get("OPENAI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
+        st.info("💡 Add your `OPENAI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
     else:
         try:
             lull_summary = subset_year_df.groupby('Position')['Pick Number'].agg(['min', 'mean', 'max']).reset_index()
             data_summary_text = lull_summary.to_string(index=False)
             
             prompt = (
-                f"You are a fantasy football data scientist studying draft economy curves. "
                 f"Analyze these draft distribution stats for the year {selected_year} detailing the pick numbers when positions went off the board:\n"
                 f"{data_summary_text}\n\n"
                 f"Provide a 3-sentence macro summary of the draft room environment.\n"
@@ -310,23 +283,10 @@ elif view_option == "Draft Position Lulls":
                 f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
             )
             with st.spinner("Analyzing drafting waves and valleys..."):
-                try:
-                    analysis_text = get_cached_ai_analysis(api_key, 'gemini-3.7-flash', prompt, "3.7")
-                    st.write(analysis_text)
-                except Exception as primary_err:
-                    if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err):
-                        client_backup = genai.Client(api_key=api_key)
-                        fallback_response = client_backup.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=prompt
-                        )
-                        st.markdown("⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.*")
-                        st.write(fallback_response.text)
-                    else:
-                        st.error(f"Could not load AI draft analysis: {str(primary_err)}")
+                analysis_text = get_cached_ai_analysis(api_key, prompt)
+                st.write(analysis_text)
         except Exception as e:
-            st.error(f"Data mapping error: {str(e)}")
-
+            st.error(f"Could not load AI draft analysis: {str(e)}")
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -385,12 +345,12 @@ elif view_option == "Player Market Value":
     st.plotly_chart(fig, use_container_width=True)
 
     st.markdown("---")
-    st.subheader(f"🤖 Gemini Player Value Audit ({selected_year} - {selected_position}s)")
+    st.subheader(f"🧠 OpenAI Player Value Audit ({selected_year} - {selected_position}s)")
     
-    api_key = st.secrets.get("GEMINI_API_KEY") or None
+    api_key = st.secrets.get("OPENAI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
+        st.info("💡 Add your `OPENAI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
     else:
         try:
             audit_df = df_clean[(df_clean['Year'] == selected_year) & (df_clean['Position'] == selected_position)].copy()
@@ -400,7 +360,6 @@ elif view_option == "Player Market Value":
             top_bargains = audit_df.sort_values(by='Discrepancy', ascending=True).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
             
             prompt = (
-                f"You are a fantasy football financial ledger auditor reviewing an auction draft league. "
                 f"Analyze these top pricing anomalies for the position {selected_position} in the draft year {selected_year}.\n\n"
                 f"Top overpaid assets (Positive means they paid a huge premium above market value):\n{top_overpaid}\n\n"
                 f"Top bargain assets (Negative means they saved money below market value):\n{top_bargains}\n\n"
@@ -410,22 +369,7 @@ elif view_option == "Player Market Value":
                 f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
             )
             with st.spinner("Auditing individual player transaction ledgers..."):
-                try:
-                    analysis_text = get_cached_ai_analysis(api_key, 'gemini-3.7-flash', prompt, "3.7")
-                    st.write(analysis_text)
-                except Exception as primary_err:
-                    if "503" in str(primary_err) or "UNAVAILABLE" in str(primary_err):
-                        client_backup = genai.Client(api_key=api_key)
-                        fallback_response = client_backup.models.generate_content(
-                            model='gemini-1.5-flash',
-                            contents=prompt
-                        )
-                        st.markdown("⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.*")
-                        st.write(fallback_response.text)
-                    else:
-                        st.error(f"Could not load player price audit: {str(primary_err)}")
+                analysis_text = get_cached_ai_analysis(api_key, prompt)
+                st.write(analysis_text)
         except Exception as e:
-            st.error(f"Could not parse data rows: {str(e)}")
-
-
-
+            st.error(f"Could not load player price audit: {str(e)}")
