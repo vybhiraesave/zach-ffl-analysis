@@ -216,6 +216,9 @@ elif view_option == "Manager Spending Habits":
         st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
     else:
         try:
+            # FIX: Added this line back to define the data text for Gemini
+            data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
+            
             client = genai.Client(api_key=api_key)
             prompt = (
                 f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
@@ -229,10 +232,11 @@ elif view_option == "Manager Spending Habits":
             )
             
             with st.spinner("Analyzing high-stakes Superflex market patterns..."):
-                # CALLED THE NEW CACHED ENGINE HERE
                 analysis_text = get_cached_ai_analysis(api_key, prompt)
                 st.write(analysis_text)
-                
+        except Exception as e:
+            st.error(f"Scouting database connection timed out: {str(e)}")
+
         except Exception as e:
             st.error(f"Scouting database connection timed out: {str(e)}")
             
