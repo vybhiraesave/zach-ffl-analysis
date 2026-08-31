@@ -150,7 +150,7 @@ if view_option == "Manager Spending Habits":
             
             with st.spinner("Gemini is dissecting the auction data room..."):
                 response = client.models.generate_content(
-                    model='gemini-2.5-flash',
+                    model='gemini-3.6-flash',
                     contents=prompt,
                 )
                 st.write(response.text)
