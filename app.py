@@ -4,7 +4,12 @@ import numpy as np
 import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
-from google import genai
+
+# NEW: Import your pre-computed static AI lookups natively!
+try:
+    from scouting_reports import MANAGER_DOSSIERS
+except ImportError:
+    MANAGER_DOSSIERS = {}
 
 # Set page configuration
 st.set_page_config(
@@ -46,22 +51,7 @@ all_positions = sorted(df_clean['Position'].unique())
 all_managers = sorted(df_clean['Manager'].unique())
 
 # ----------------------------------------------------
-# 2. STABLE HIGH-THROUGHPUT GEMINI INTEL ENGINE (Using 2.5-Flash)
-# ----------------------------------------------------
-@st.cache_data(show_spinner=False)
-def get_cached_ai_analysis(api_key, prompt):
-    try:
-        client = genai.Client(api_key=api_key)
-        response = client.models.generate_content(
-            model='gemini-3.6-flash', 
-            contents=prompt
-        )
-        return response.text
-    except Exception as e:
-        return f"Could not connect to the scouting network: {str(e)}"
-
-# ----------------------------------------------------
-# 3. SIDEBAR NAVIGATION
+# 2. SIDEBAR NAVIGATION
 # ----------------------------------------------------
 st.sidebar.title("🏈 Auction Analysis Engine")
 st.sidebar.markdown("Analyzing historical draft inefficiencies to deliver a structural championship blueprint.")
@@ -81,7 +71,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
         st.markdown("""
         Welcome to the **Auction Analysis Engine**! This tool is engineered to break down your home league's historical trends (2021–2025) and help you exploit manager tendencies. Here is how to navigate the strategy room:
         *   **1. Executive Blueprint (Home Page):** View the lifetime capital ROI leaderboard to instantly pinpoint who overspends and who finds bargains. Review the custom multi-column tactical blueprint for the 2026 draft.
-        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **Gemini AI Scouting Report** detailing their Superflex anomalies and how to beat them.
+        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **Pre-Calculated Scouting Dossier** detailing their Superflex anomalies and how to beat them.
         *   **3. Draft Position Lulls:** Toggle draft years to look at the historical flow of when positions fly off the board. Target the 'valleys' to secure players where market competition cools down.
         *   **4. Player Market Value:** Analyze individual asset pricing. Grouped horizontal bars let you compare actual league paid percentages directly against baseline market consensus values.
         """)
@@ -91,13 +81,12 @@ if view_option == "Executive Blueprint (2026 Plan)":
     df_clean['Premium_Paid'] = df_clean['Cap_Percent'] - df_clean['Consensus_AAV_Cap_Percent']
     avg_premium_by_manager = df_clean.groupby('Manager')['Premium_Paid'].mean().reset_index()
     
-    # Fixed: Sorting first, then grabbing the string value out of the very first row [0]
     sorted_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False)
     most_aggressive = sorted_aggressive['Manager'].values[0]
-    
+
     sorted_bargains = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True)
     biggest_bargain_hunter = sorted_bargains['Manager'].values[0]
-
+    
     m1, m2, m3 = st.columns(3)
     with m1:
         st.metric(label="League Economy", value="10 Teams / $200 Cap", delta="Superflex (2 QB Config)")
@@ -147,6 +136,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
             "2. **Target the Pick 40-70 Lull:** Bank multiple high-floor WRs and RB2s in the dead zones where the league economy traditionally dries up.\n"
             "3. **Superflex Asset Shielding:** Do not leave the draft without locking down 3 starting QBs; mid-tier league value provides an elite cost-adjusted window."
         )
+
 
 # ----------------------------------------------------
 # VIEW 1: MANAGER SPENDING HABITS
@@ -206,32 +196,14 @@ elif view_option == "Manager Spending Habits":
     else:
         st.warning(f"No data available for {selected_manager} drafting {selected_position} positions.")
 
+    # --- INSTANT STATIC SCOUTING REPORT ---
     st.markdown("---")
-    st.subheader(f"🤖 Gemini Superflex Scouting Profile: {selected_manager}")
+    st.subheader(f"📋 Compiled Dossier: {selected_manager}'s Roster Building Footprint")
     
-    api_key = st.secrets.get("GEMINI_API_KEY") or None
-    
-    if not api_key:
-        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
+    if selected_manager in MANAGER_DOSSIERS:
+        st.write(MANAGER_DOSSIERS[selected_manager])
     else:
-        try:
-            data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
-            prompt = (
-                f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
-                f"Deconstruct this multi-year positional data for manager '{selected_manager}' regarding the '{selected_position}' position.\n"
-                f"{data_summary_text}\n\n"
-                f"Write a comprehensive scouting report tailored for the 2026 draft. Your analysis must cover:\n"
-                f"1. **Positional Economy Evaluation**: Compare their real cap% spend trends versus consensus market metrics. Are they a hyper-aggressive bidder or a value hunter?\n"
-                f"2. **Superflex Draft Anomalies**: Evaluate if this manager panics during aggressive early position runs (like overspending on mid-tier QBs to secure a second starter) or if they successfully weaponize capital during cross-positional value dips.\n"
-                f"3. **2026 Tactical Counter-Strategy**: Give a specific rule or psychological trap to use against this exact manager in the upcoming draft room to force them into bad math or exhaustion of budget.\n"
-                f"Tone: Dense, direct, analytical, and highly strategic. Use bold headers and clean structure for maximum scannability."
-            )
-            
-            with st.spinner("Analyzing high-stakes Superflex market patterns..."):
-                analysis_text = get_cached_ai_analysis(api_key, prompt)
-                st.write(analysis_text)
-        except Exception as e:
-            st.error(f"Scouting database connection error: {str(e)}")
+        st.info("📊 Scouting documentation file is currently being indexed for this manager profile entry.")
 
     with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
@@ -263,33 +235,7 @@ elif view_option == "Draft Position Lulls":
     plt.grid(True, linestyle='--', alpha=0.5)
     
     st.pyplot(fig)
-
-    st.markdown("---")
-    st.subheader(f"🤖 Gemini AI Draft Flow Assessment ({selected_year})")
-    
-    api_key = st.secrets.get("GEMINI_API_KEY") or None
-    
-    if not api_key:
-        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
-    else:
-        try:
-            lull_summary = subset_year_df.groupby('Position')['Pick Number'].agg(['min', 'mean', 'max']).reset_index()
-            data_summary_text = lull_summary.to_string(index=False)
-            
-            prompt = (
-                f"You are a fantasy football data scientist studying draft economy curves. "
-                f"Analyze these draft distribution stats for the year {selected_year} detailing the pick numbers when positions went off the board:\n"
-                f"{data_summary_text}\n\n"
-                f"Provide a 3-sentence macro summary of the draft room environment.\n"
-                f"Sentence 1: Detail where the heaviest positional run took place based on the pick numbers.\n"
-                f"Sentence 2: Identify any obvious drafting lulls or windows where value dropped significantly.\n"
-                f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
-            )
-            with st.spinner("Analyzing drafting waves and valleys..."):
-                analysis_text = get_cached_ai_analysis(api_key, prompt)
-                st.write(analysis_text)
-        except Exception as e:
-            st.error(f"Could not load AI draft analysis: {str(e)}")
+    st.caption("ℹ️ Peaks display heavy positional cluster runs; deep layout valleys showcase cost-adjusted draft draft room lulls.")
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -346,36 +292,3 @@ elif view_option == "Player Market Value":
     )
     
     st.plotly_chart(fig, use_container_width=True)
-
-    st.markdown("---")
-    st.subheader(f"🤖 Gemini Player Value Audit ({selected_year} - {selected_position}s)")
-    
-    api_key = st.secrets.get("GEMINI_API_KEY") or None
-    
-    if not api_key:
-        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
-    else:
-        try:
-            audit_df = df_clean[(df_clean['Year'] == selected_year) & (df_clean['Position'] == selected_position)].copy()
-            audit_df['Discrepancy'] = audit_df['Cap_Percent'] - audit_df['Consensus_AAV_Cap_Percent']
-            
-            top_overpaid = audit_df.sort_values(by='Discrepancy', ascending=False).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
-            top_bargains = audit_df.sort_values(by='Discrepancy', ascending=True).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
-            
-            prompt = (
-                f"You are a fantasy football financial ledger auditor reviewing an auction draft league. "
-                f"Analyze these top pricing anomalies for the position {selected_position} in the draft year {selected_year}.\n\n"
-                f"Top overpaid assets (Positive means they paid a huge premium above market value):\n{top_overpaid}\n\n"
-                f"Top bargain assets (Negative means they saved money below market value):\n{top_bargains}\n\n"
-                f"Provide a crisp 3-sentence economic teardown.\n"
-                f"Sentence 1: Highlight who the biggest overpayment was and why that manager compromised their budget economy.\n"
-                f"Sentence 2: Identify the best value bargain won in the room and the manager who secured it.\n"
-                f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
-            )
-            with st.spinner("Auditing individual player transaction ledgers..."):
-                analysis_text = get_cached_ai_analysis(api_key, prompt)
-                st.write(analysis_text)
-        except Exception as e:
-            st.error(f"Could not load player price audit: {str(e)}")
-
-
