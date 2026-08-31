@@ -4,4 +4,4 @@ numpy
 plotly
 seaborn
 matplotlib
-google-genai
+google-genai>=2.9.0
