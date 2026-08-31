@@ -4,6 +4,7 @@ import numpy as np
 import plotly.express as px
 import seaborn as sns
 import matplotlib.pyplot as plt
+from google import genai
 
 # Set page configuration
 st.set_page_config(
@@ -17,25 +18,18 @@ st.set_page_config(
 # ----------------------------------------------------
 @st.cache_data
 def load_and_clean_data():
-    # Update this path to where your file sits relative to app.py
-    # For sharing, it's best to keep the CSV in the same folder as this script!
     try:
         df = pd.read_csv('zach-final-data-table - data_table.csv')
     except FileNotFoundError:
         st.error("Could not find 'zach-final-data-table - data_table.csv'. Please make sure it's in the same directory as app.py.")
         return pd.DataFrame()
 
-    # Drop unwanted columns if present
     if 'Player_Team' in df.columns:
         df = df.drop(columns=['Player_Team'])
         
-    # Clean position names and strip whitespace
     df['Position'] = df['Position'].astype(str).str.strip()
-    
-    # Filter out K and D/ST as per notebook logic
     df = df[~df['Position'].isin(['K', 'D/ST'])]
     
-    # Ensure numeric columns are handled gracefully
     df['Pick Number'] = pd.to_numeric(df['Pick Number'], errors='coerce')
     df = df.dropna(subset=['Pick Number'])
     df['Year'] = df['Year'].astype(int)
@@ -53,9 +47,9 @@ if df_clean.empty:
 st.sidebar.title("🏈 Auction Analysis")
 st.sidebar.markdown("Use this dashboard to find inefficiencies and manager tendencies in Zach's Superflex league.")
 
-# Global Filter Options
 all_years = sorted(df_clean['Year'].unique())
 all_positions = sorted(df_clean['Position'].unique())
+all_managers = sorted(df_clean['Manager'].unique())
 
 view_option = st.sidebar.radio(
     "Select Analysis View",
@@ -67,10 +61,14 @@ view_option = st.sidebar.radio(
 # ----------------------------------------------------
 if view_option == "Manager Spending Habits":
     st.header("💰 How do Managers Value Positions?")
-    st.markdown("This view displays the historical percent of cap a manager spent on a position versus the consensus value of the players they selected.")
+    st.markdown("Track historical budget allocation versus market consensus to break down positional investment habits.")
     
-    # Filter by position dynamically
-    selected_position = st.selectbox("Select Position to Analyze", all_positions)
+    # NEW FILTERS: Filter down to a specific manager and position to clean up the noise!
+    col_f1, col_f2 = st.columns(2)
+    with col_f1:
+        selected_manager = st.selectbox("Select Manager", all_managers)
+    with col_f2:
+        selected_position = st.selectbox("Select Position", all_positions)
     
     # Process group-by logic from notebook
     summary_df = df_clean.groupby(['Manager', 'Year', 'Position']).agg(
@@ -78,7 +76,11 @@ if view_option == "Manager Spending Habits":
         Total_Consensus_AAV_Cap_Percent=('Consensus_AAV_Cap_Percent', 'sum')
     ).reset_index()
     
-    subset_df = summary_df[summary_df['Position'] == selected_position]
+    # Filter by both user criteria
+    subset_df = summary_df[
+        (summary_df['Position'] == selected_position) & 
+        (summary_df['Manager'] == selected_manager)
+    ]
     
     # Reshape data cleanly for visualization
     melted_df = subset_df.melt(
@@ -88,33 +90,75 @@ if view_option == "Manager Spending Habits":
         value_name='Cap_Value'
     )
     melted_df['Cap_Metric'] = melted_df['Cap_Metric'].map({
-        'Total_Cap_Percent': 'Actual League Spent %',
-        'Total_Consensus_AAV_Cap_Percent': 'Consensus AAV Value %'
+        'Total_Cap_Percent': 'Actual Budget Spent %',
+        'Total_Consensus_AAV_Cap_Percent': 'Consensus Value %'
     })
+
+    # Render customized visualization
+    if not melted_df.empty:
+        fig, ax = plt.subplots(figsize=(10, 4.5))
+        sns.lineplot(
+            data=melted_df,
+            x='Year',
+            y='Cap_Value',
+            style='Cap_Metric',
+            hue='Cap_Metric',
+            markers=True,
+            dashes=[(1, 0), (2, 2)],
+            palette=['#1E3A8A', '#94A3B8'], # Crisp contrast colors
+            linewidth=2.5,
+            ax=ax
+        )
+        ax.set_title(f'{selected_manager}: Budget Spent vs Market Value ({selected_position})', fontsize=12, fontweight='bold')
+        ax.set_xlabel('Year')
+        ax.set_ylabel('Total Cap Percentage (%)')
+        plt.xticks(all_years)
+        plt.grid(True, linestyle='--', alpha=0.5)
+        plt.legend(title='Metric Details', loc='best')
+        st.pyplot(fig)
+    else:
+        st.warning(f"No data available for {selected_manager} drafting {selected_position} positions.")
+
+    # --- NEW FEATURE: AI-GENERATED INGENUITY FROM GEMINI ---
+    st.markdown("---")
+    st.subheader(f"🤖 Gemini Analysis: {selected_manager}'s Draft Profile")
     
-    # Render with Matplotlib/Seaborn as per notebook instructions
-    fig, ax = plt.subplots(figsize=(12, 6))
-    sns.lineplot(
-        data=melted_df,
-        x='Year',
-        y='Cap_Value',
-        hue='Manager',
-        style='Cap_Metric',
-        markers=True,
-        dashes=[(1, 0), (2, 2)],
-        palette='deep',
-        ax=ax
-    )
-    ax.set_title(f'Cap % vs. Consensus AAV Cap % for {selected_position} Over Time', fontsize=14)
-    ax.set_xlabel('Year')
-    ax.set_ylabel('Cap Percentage (%)')
-    plt.xticks(all_years)
-    plt.grid(True, linestyle='--', alpha=0.5)
-    plt.legend(title='Manager & Metric', bbox_to_anchor=(1.05, 1), loc='upper left')
+    # Securely retrieve your user api key if configured, or check for system configurations
+    api_key = st.secrets.get("GEMINI_API_KEY") or None
     
-    st.pyplot(fig)
-    
-    with st.expander("View Raw Spreadsheet Data"):
+    if not api_key:
+        st.info("💡 To generate live insights with Gemini, go to your repository settings on Streamlit Cloud and add `GEMINI_API_KEY` to your app Secrets.")
+        st.markdown(f"**Draft Notes for {selected_manager}:** Reviewing the trendline chart highlights periods of aggressive premiums or heavy roster value accumulation across the 2021–2025 timelines.")
+    else:
+        try:
+            # Construct a clear data table string to feed directly to Gemini
+            data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
+            
+            # Initialize client and query the flash model
+            client = genai.Client(api_key=api_key)
+            
+            prompt = (
+                f"You are a high-level fantasy football league analyst assessing an auction draft league. "
+                f"Analyze this multi-year draft data for fantasy football manager '{selected_manager}' focusing specifically on the '{selected_position}' position. "
+                f"Data table (shows how much actual draft cap % they spent vs what the consensus market baseline values were for those players):\n"
+                f"{data_summary_text}\n\n"
+                f"Provide a punchy, 3-sentence summary in a conversational tone. "
+                f"Sentence 1: State whether they typically overspend (aggressive) or underspend (bargain hunting) compared to consensus on this position. "
+                f"Sentence 2: Identify any noticeable spikes, years of heavy shift, or tactical behaviors. "
+                f"Sentence 3: Provide a quick tactical piece of advice for playing against them in future drafts based on this data. Use bold elements for scannability."
+            )
+            
+            with st.spinner("Gemini is dissecting the auction data room..."):
+                response = client.models.generate_content(
+                    model='gemini-2.5-flash',
+                    contents=prompt,
+                )
+                st.write(response.text)
+                
+        except Exception as e:
+            st.error(f"Could not reach Gemini API. Technical Check: {str(e)}")
+
+    with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
 
 # ----------------------------------------------------
@@ -127,7 +171,6 @@ elif view_option == "Draft Position Lulls":
     selected_year = st.selectbox("Select Draft Year", all_years)
     subset_year_df = df_clean[df_clean['Year'] == selected_year]
     
-    # Kernel Density Estimate Plot
     fig, ax = plt.subplots(figsize=(12, 5))
     sns.kdeplot(
         data=subset_year_df,
@@ -145,7 +188,6 @@ elif view_option == "Draft Position Lulls":
     plt.grid(True, linestyle='--', alpha=0.5)
     
     st.pyplot(fig)
-    st.caption("Peaks show a high volume of that position going off the board simultaneously (a run). Valleys indicate drafting lulls.")
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -160,7 +202,6 @@ elif view_option == "Player Market Value":
     with col2:
         selected_position = st.selectbox("Select Position", all_positions, key="player_pos")
         
-    # Melt data format for side-by-side player comparisons
     melted_players = df_clean.melt(
         id_vars=['Manager', 'Year', 'Position', 'Player', 'Team', 'Pick Number', 'Amount'],
         value_vars=['Cap_Percent', 'Consensus_AAV_Cap_Percent'],
@@ -172,16 +213,13 @@ elif view_option == "Player Market Value":
         'Consensus_AAV_Cap_Percent': 'Consensus AAV Cap %'
     })
     
-    # Apply user filters
     final_player_df = melted_players[
         (melted_players['Year'] == selected_year) & 
         (melted_players['Position'] == selected_position)
     ]
     
-    # Fixed Axis Buffer Calculation
     max_val = melted_players['Cap_Value_Percent'].max() * 1.1
     
-    # Plotly Interactivity 
     fig = px.bar(
         final_player_df,
         y='Player',
@@ -195,7 +233,7 @@ elif view_option == "Player Market Value":
             'Player': 'Player Name',
             'Cap_Metric_Type': 'Valuation'
         },
-        height=max(400, len(final_player_df) * 15), # Dynamically sizes based on player count
+        height=max(400, len(final_player_df) * 15),
         range_x=[0, max_val]
     )
     
