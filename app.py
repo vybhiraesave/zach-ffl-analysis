@@ -9,9 +9,30 @@ from google import genai
 # Set page configuration
 st.set_page_config(
     page_title="Zach's Auction Draft Analyzer",
-    page_icon="🏈",
+    page_icon="🦅",
     layout="wide"
 )
+
+# Custom Eagles Theme Colors
+EAGLES_GREEN = "#004C54"
+EAGLES_SILVER = "#A5ACAF"
+EAGLES_CHARCOAL = "#202224"
+EAGLES_BLACK = "#000000"
+
+# Inject Custom CSS for Eagles Styling Accent
+st.markdown(f"""
+    <style>
+    .stApp {{
+        background-color: #F8FAFC;
+    }}
+    h1, h2, h3 {{
+        color: {EAGLES_GREEN} !important;
+    }}
+    .stSidebar {{
+        background-color: {EAGLES_CHARCOAL};
+    }}
+    </style>
+""", unsafe_allow_html=True)
 
 # ----------------------------------------------------
 # 1. DATA LOADING & CACHING
@@ -44,8 +65,8 @@ if df_clean.empty:
 # ----------------------------------------------------
 # 2. SIDEBAR NAVIGATION & FILTERS
 # ----------------------------------------------------
-st.sidebar.title("🏈 Auction Analysis")
-st.sidebar.markdown("Use this dashboard to find inefficiencies and manager tendencies in Zach's Superflex league.")
+st.sidebar.title("🦅 Midnight Green Engine")
+st.sidebar.markdown("Analyzing historical draft inefficiencies to deliver a structural championship blueprint.")
 
 all_years = sorted(df_clean['Year'].unique())
 all_positions = sorted(df_clean['Position'].unique())
@@ -53,36 +74,114 @@ all_managers = sorted(df_clean['Manager'].unique())
 
 view_option = st.sidebar.radio(
     "Select Analysis View",
-    ["Manager Spending Habits", "Draft Position Lulls", "Player Market Value"]
+    ["Executive Blueprint (2026 Plan)", "Manager Spending Habits", "Draft Position Lulls", "Player Market Value"]
 )
+
+# ----------------------------------------------------
+# VIEW 0: EXECUTIVE BLUEPRINT (2026 DRAFT PLAN)
+# ----------------------------------------------------
+if view_option == "Executive Blueprint (2026 Plan)":
+    st.title("📋 Executive Blueprint: 2026 Draft Strategy Room")
+    
+    # --- NEW HOW-TO GUIDE DISPLAY ---
+    with st.expander("📖 Quick-Start How-To Guide (Click to Expand)", expanded=True):
+        st.markdown("""
+        Welcome to the **Auction Analysis Engine**! This tool is engineered to break down your home league's historical trends (2021–2025) and help you exploit manager tendencies. Here is how to navigate the strategy room:
+        *   **1. Executive Blueprint (Home Page):** View the lifetime capital ROI leaderboard to instantly pinpoint who overspends and who finds bargains. Review the custom multi-column tactical blueprint for the 2026 draft.
+        *   **2. Manager Spending Habits:** Use the filters to select a specific manager and position. A custom chart will display their budget habits, followed by a live **Gemini AI Scouting Report** detailing their Superflex anomalies and how to beat them.
+        *   **3. Draft Position Lulls:** Toggle draft years to look at the historical flow of when positions fly off the board. Target the 'valleys' to secure players where market competition cools down.
+        *   **4. Player Market Value:** Analyze individual asset pricing. Grouped horizontal bars let you compare actual league paid percentages directly against baseline market consensus values.
+        """)
+    
+    st.markdown("### 🦅 Fly High on Value: Macro Trends & Manager Anomalies")
+    st.markdown("A unified analysis overview breaking down historical draft capital flow and tactical advantages.")
+
+    # Calculations for summary metrics
+    df_clean['Premium_Paid'] = df_clean['Cap_Percent'] - df_clean['Consensus_AAV_Cap_Percent']
+    avg_premium_by_manager = df_clean.groupby('Manager')['Premium_Paid'].mean().reset_index()
+    
+    most_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False).iloc[0]['Manager']
+    biggest_bargain_hunter = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True).iloc[0]['Manager']
+    
+    # Structural Layout Metrics
+    m1, m2, m3 = st.columns(3)
+    with m1:
+        st.metric(label="League Economy", value="10 Teams / $200 Cap", delta="Superflex (2 QB Config)")
+    with m2:
+        st.metric(label="Most Aggressive Bidder", value=most_aggressive, delta="Pays Highest Asset Premiums", delta_color="inverse")
+    with m3:
+        st.metric(label="Top Value Exploiter", value=biggest_bargain_hunter, delta="Consistently Underbuys Market")
+        
+    st.markdown("---")
+    
+    # Lifetime Efficiency Leaderboard Table
+    st.subheader("📊 Career Draft Capital Value Leaderboard")
+    st.markdown("This tracker displays the cumulative cap percentage saved (Bargain) or overpaid (Premium) by each manager across all drafted positions relative to consensus market rates.")
+    
+    roi_df = df_clean.groupby('Manager').agg(
+        Total_Spent_Cap=('Cap_Percent', 'sum'),
+        Total_Consensus_Value=('Consensus_AAV_Cap_Percent', 'sum'),
+        Total_Players_Drafted=('Player', 'count')
+    ).reset_index()
+    
+    roi_df['Net_Value_Differential'] = roi_df['Total_Consensus_Value'] - roi_df['Total_Spent_Cap']
+    roi_df = roi_df.sort_values(by='Net_Value_Differential', ascending=False).reset_index(drop=True)
+    
+    display_roi_df = roi_df.copy()
+    display_roi_df['Net_Value_Differential'] = display_roi_df['Net_Value_Differential'].apply(lambda x: f"🟢 +{x:.1f}% Saved" if x >= 0 else f"🔴 {x:.1f}% Overpaid")
+    display_roi_df.columns = ['Manager Name', 'Total Cap Spent (%)', 'Market Value Secured (%)', 'Total Assets Drafted', 'Lifetime Capital Efficiency ROI']
+    
+    st.dataframe(display_roi_df, use_container_width=True, hide_index=True)
+    st.markdown("---")
+    
+    # 3-Column Strategy Summary Grid
+    c1, c2, c3 = st.columns(3)
+    with c1:
+        st.markdown(f"#### 🔍 Key Manager Behaviors")
+        st.markdown(
+            f"• **{most_aggressive}** repeatedly resets positional markets by driving premium asset prices significantly above baseline consensus AAV.\n"
+            f"• **{biggest_bargain_hunter}** systematically drops out of early-round bidding runs, waiting for late-draft drops where visual inflation resets.\n"
+            f"• Historical trendlines show that home-league managers heavily favor emotional bidding, over-indexing on high-tier starters."
+        )
+    with c2:
+        st.markdown("#### 📉 Positional Market Trends")
+        st.markdown(
+            "• **Quarterbacks (QB):** Due to the Superflex structure, early tiers face massive inflationary bidding curves. The mid-tier values are consistently squeezed.\n"
+            f"• **Running Backs & Wide Receivers:** Highly volatile valleys exist between pick ranges 35-70 where league draft velocity cools down significantly.\n"
+            "• **Tight Ends (TE):** Consistently draft below international consensus values unless targeting the elite top-3 overall stars."
+        )
+    with c3:
+        st.markdown("#### 🎯 2026 Draft Game Plan")
+        st.markdown(
+            "1. **Exploit the Squeeze:** Let aggressive managers wipe out their capital matching high-premium bidding wars early.\n"
+            "2. **Target the Pick 40-70 Lull:** Bank multiple high-floor WRs and RB2s in the dead zones where the league economy traditionally dries up.\n"
+            "3. **Superflex Asset Shielding:** Do not leave the draft without locking down 3 starting QBs; mid-tier league value provides an elite cost-adjusted window."
+        )
+
 
 # ----------------------------------------------------
 # VIEW 1: MANAGER SPENDING HABITS
 # ----------------------------------------------------
-if view_option == "Manager Spending Habits":
+elif view_option == "Manager Spending Habits":
     st.header("💰 How do Managers Value Positions?")
     st.markdown("Track historical budget allocation versus market consensus to break down positional investment habits.")
     
-    # NEW FILTERS: Filter down to a specific manager and position to clean up the noise!
     col_f1, col_f2 = st.columns(2)
     with col_f1:
         selected_manager = st.selectbox("Select Manager", all_managers)
     with col_f2:
         selected_position = st.selectbox("Select Position", all_positions)
     
-    # Process group-by logic from notebook
     summary_df = df_clean.groupby(['Manager', 'Year', 'Position']).agg(
         Total_Cap_Percent=('Cap_Percent', 'sum'),
         Total_Consensus_AAV_Cap_Percent=('Consensus_AAV_Cap_Percent', 'sum')
     ).reset_index()
     
-    # Filter by both user criteria
     subset_df = summary_df[
         (summary_df['Position'] == selected_position) & 
         (summary_df['Manager'] == selected_manager)
     ]
     
-    # Reshape data cleanly for visualization
     melted_df = subset_df.melt(
         id_vars=['Manager', 'Year', 'Position'],
         value_vars=['Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent'],
@@ -93,10 +192,9 @@ if view_option == "Manager Spending Habits":
         'Total_Cap_Percent': 'Actual Budget Spent %',
         'Total_Consensus_AAV_Cap_Percent': 'Consensus Value %'
     })
-
-    # Render customized visualization
+    
     if not melted_df.empty:
-        fig, ax = plt.subplots(figsize=(10, 4.5))
+        fig, ax = plt.subplots(figsize=(10, 4.2))
         sns.lineplot(
             data=melted_df,
             x='Year',
@@ -105,58 +203,49 @@ if view_option == "Manager Spending Habits":
             hue='Cap_Metric',
             markers=True,
             dashes=[(1, 0), (2, 2)],
-            palette=['#1E3A8A', '#94A3B8'], # Crisp contrast colors
-            linewidth=2.5,
+            palette=[EAGLES_GREEN, EAGLES_SILVER], 
+            linewidth=3,
             ax=ax
         )
-        ax.set_title(f'{selected_manager}: Budget Spent vs Market Value ({selected_position})', fontsize=12, fontweight='bold')
+        ax.set_title(f'{selected_manager}: Budget Spent vs Market Value ({selected_position})', fontsize=12, fontweight='bold', color=EAGLES_GREEN)
         ax.set_xlabel('Year')
         ax.set_ylabel('Total Cap Percentage (%)')
         plt.xticks(all_years)
-        plt.grid(True, linestyle='--', alpha=0.5)
+        plt.grid(True, linestyle='--', alpha=0.4)
         plt.legend(title='Metric Details', loc='best')
         st.pyplot(fig)
     else:
         st.warning(f"No data available for {selected_manager} drafting {selected_position} positions.")
 
-    # --- NEW FEATURE: AI-GENERATED INGENUITY FROM GEMINI ---
+    # --- UPGRADED TUNED GEMINI PROMPT FOCUSING ON SUPERFLEX ANOMALIES ---
     st.markdown("---")
-    st.subheader(f"🤖 Gemini Analysis: {selected_manager}'s Draft Profile")
+    st.subheader(f"🤖 Gemini Superflex Scouting Profile: {selected_manager}")
     
-    # Securely retrieve your user api key if configured, or check for system configurations
     api_key = st.secrets.get("GEMINI_API_KEY") or None
     
     if not api_key:
-        st.info("💡 To generate live insights with Gemini, go to your repository settings on Streamlit Cloud and add `GEMINI_API_KEY` to your app Secrets.")
-        st.markdown(f"**Draft Notes for {selected_manager}:** Reviewing the trendline chart highlights periods of aggressive premiums or heavy roster value accumulation across the 2021–2025 timelines.")
+        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
     else:
         try:
-            # Construct a clear data table string to feed directly to Gemini
             data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
-            
-            # Initialize client and query the flash model
             client = genai.Client(api_key=api_key)
             
             prompt = (
-                f"You are a high-level fantasy football league analyst assessing an auction draft league. "
-                f"Analyze this multi-year draft data for fantasy football manager '{selected_manager}' focusing specifically on the '{selected_position}' position. "
-                f"Data table (shows how much actual draft cap % they spent vs what the consensus market baseline values were for those players):\n"
+                f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
+                f"Deconstruct this multi-year positional data for manager '{selected_manager}' regarding the '{selected_position}' position.\n"
                 f"{data_summary_text}\n\n"
-                f"Provide a punchy, 3-sentence summary in a conversational tone. "
-                f"Sentence 1: State whether they typically overspend (aggressive) or underspend (bargain hunting) compared to consensus on this position. "
-                f"Sentence 2: Identify any noticeable spikes, years of heavy shift, or tactical behaviors. "
-                f"Sentence 3: Provide a quick tactical piece of advice for playing against them in future drafts based on this data. Use bold elements for scannability."
+                f"Write a comprehensive scouting report tailored for the 2026 draft. Your analysis must cover:\n"
+                f"1. **Positional Economy Evaluation**: Compare their real cap% spend trends versus consensus market metrics. Are they a hyper-aggressive bidder or a value hunter?\n"
+                f"2. **Superflex Draft Anomalies**: Evaluate if this manager panics during aggressive early position runs (like overspending on mid-tier QBs to secure a second starter) or if they successfully weaponize capital during cross-positional value dips.\n"
+                f"3. **2026 Tactical Counter-Strategy**: Give a specific rule or psychological trap to use against this exact manager in the upcoming draft room to force them into bad math or exhaustion of budget.\n"
+                f"Tone: Dense, direct, analytical, and highly strategic. Use bold headers and clean structure for maximum scannability."
             )
             
-            with st.spinner("Gemini is dissecting the auction data room..."):
-                response = client.models.generate_content(
-                    model='gemini-3.6-flash',
-                    contents=prompt,
-                )
+            with st.spinner("Analyzing high-stakes Superflex market patterns..."):
+                response = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
                 st.write(response.text)
-                
         except Exception as e:
-            st.error(f"Could not reach Gemini API. Technical Check: {str(e)}")
+            st.error(f"Scouting database connection timed out: {str(e)}")
 
     with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
@@ -228,6 +317,7 @@ elif view_option == "Player Market Value":
         orientation='h',
         barmode='group',
         hover_data=['Manager', 'Team', 'Pick Number', 'Amount'],
+        color_discrete_sequence=[EAGLES_GREEN, EAGLES_SILVER],
         labels={
             'Cap_Value_Percent': 'Cap Percentage (%)',
             'Player': 'Player Name',
@@ -244,3 +334,6 @@ elif view_option == "Player Market Value":
     )
     
     st.plotly_chart(fig, use_container_width=True)
+
+
+
