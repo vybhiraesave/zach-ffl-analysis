@@ -13,9 +13,6 @@ st.set_page_config(
     layout="wide"
 )
 
-# Using system defaults instead of forced custom colors to perfectly support Dark/Light mode!
-
-
 # ----------------------------------------------------
 # 1. DATA LOADING & CACHING
 # ----------------------------------------------------
@@ -47,7 +44,7 @@ if df_clean.empty:
 # ----------------------------------------------------
 # 2. SIDEBAR NAVIGATION & FILTERS
 # ----------------------------------------------------
-st.sidebar.title("🦅 Midnight Green Engine")
+st.sidebar.title("🏈 Auction Analysis Engine")
 st.sidebar.markdown("Analyzing historical draft inefficiencies to deliver a structural championship blueprint.")
 
 all_years = sorted(df_clean['Year'].unique())
@@ -65,7 +62,6 @@ view_option = st.sidebar.radio(
 if view_option == "Executive Blueprint (2026 Plan)":
     st.title("📋 Executive Blueprint: 2026 Draft Strategy Room")
     
-    # --- NEW HOW-TO GUIDE DISPLAY ---
     with st.expander("📖 Quick-Start How-To Guide (Click to Expand)", expanded=True):
         st.markdown("""
         Welcome to the **Auction Analysis Engine**! This tool is engineered to break down your home league's historical trends (2021–2025) and help you exploit manager tendencies. Here is how to navigate the strategy room:
@@ -75,17 +71,15 @@ if view_option == "Executive Blueprint (2026 Plan)":
         *   **4. Player Market Value:** Analyze individual asset pricing. Grouped horizontal bars let you compare actual league paid percentages directly against baseline market consensus values.
         """)
     
-    st.markdown("### 🦅 Fly High on Value: Macro Trends & Manager Anomalies")
+    st.markdown("### 📈 Macro Trends & Manager Anomalies")
     st.markdown("A unified analysis overview breaking down historical draft capital flow and tactical advantages.")
 
-    # Calculations for summary metrics
     df_clean['Premium_Paid'] = df_clean['Cap_Percent'] - df_clean['Consensus_AAV_Cap_Percent']
     avg_premium_by_manager = df_clean.groupby('Manager')['Premium_Paid'].mean().reset_index()
     
     most_aggressive = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=False).iloc[0]['Manager']
     biggest_bargain_hunter = avg_premium_by_manager.sort_values(by='Premium_Paid', ascending=True).iloc[0]['Manager']
     
-    # Structural Layout Metrics
     m1, m2, m3 = st.columns(3)
     with m1:
         st.metric(label="League Economy", value="10 Teams / $200 Cap", delta="Superflex (2 QB Config)")
@@ -96,7 +90,6 @@ if view_option == "Executive Blueprint (2026 Plan)":
         
     st.markdown("---")
     
-    # Lifetime Efficiency Leaderboard Table
     st.subheader("📊 Career Draft Capital Value Leaderboard")
     st.markdown("This tracker displays the cumulative cap percentage saved (Bargain) or overpaid (Premium) by each manager across all drafted positions relative to consensus market rates.")
     
@@ -116,7 +109,6 @@ if view_option == "Executive Blueprint (2026 Plan)":
     st.dataframe(display_roi_df, use_container_width=True, hide_index=True)
     st.markdown("---")
     
-    # 3-Column Strategy Summary Grid
     c1, c2, c3 = st.columns(3)
     with c1:
         st.markdown(f"#### 🔍 Key Manager Behaviors")
@@ -139,7 +131,6 @@ if view_option == "Executive Blueprint (2026 Plan)":
             "2. **Target the Pick 40-70 Lull:** Bank multiple high-floor WRs and RB2s in the dead zones where the league economy traditionally dries up.\n"
             "3. **Superflex Asset Shielding:** Do not leave the draft without locking down 3 starting QBs; mid-tier league value provides an elite cost-adjusted window."
         )
-
 
 # ----------------------------------------------------
 # VIEW 1: MANAGER SPENDING HABITS
@@ -185,7 +176,7 @@ elif view_option == "Manager Spending Habits":
             hue='Cap_Metric',
             markers=True,
             dashes=[(1, 0), (2, 2)],
-            palette='tab10',  # Clean default multi-mode color system 
+            palette='tab10', 
             linewidth=3,
             ax=ax
         )
@@ -199,7 +190,6 @@ elif view_option == "Manager Spending Habits":
     else:
         st.warning(f"No data available for {selected_manager} drafting {selected_position} positions.")
 
-    # --- UPGRADED TUNED GEMINI PROMPT FOCUSING ON SUPERFLEX ANOMALIES ---
     st.markdown("---")
     st.subheader(f"🤖 Gemini Superflex Scouting Profile: {selected_manager}")
     
@@ -224,14 +214,19 @@ elif view_option == "Manager Spending Habits":
             )
             
             with st.spinner("Analyzing high-stakes Superflex market patterns..."):
-                response = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
+                response = client.models.generate_content(
+                    model='gemini-3.7-flash', 
+                    contents=prompt,
+                    config=genai.types.GenerateContentConfig(
+                        thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
+                    )
+                )
                 st.write(response.text)
         except Exception as e:
             st.error(f"Scouting database connection timed out: {str(e)}")
-
+            
     with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
-
 # ----------------------------------------------------
 # VIEW 2: DRAFT POSITION LULLS
 # ----------------------------------------------------
@@ -249,7 +244,7 @@ elif view_option == "Draft Position Lulls":
         hue='Position',
         fill=True,
         common_norm=False,
-        palette='muted', # Clean theme-friendly palette
+        palette='muted',
         linewidth=2,
         ax=ax
     )
@@ -260,7 +255,6 @@ elif view_option == "Draft Position Lulls":
     
     st.pyplot(fig)
 
-    # --- NEW FEATURE: DRAFT LULL AI RADAR ANALYSIS ---
     st.markdown("---")
     st.subheader(f"🤖 Gemini AI Draft Flow Assessment ({selected_year})")
     
@@ -270,7 +264,6 @@ elif view_option == "Draft Position Lulls":
         st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
     else:
         try:
-            # Generate a summary string showing where each position was taken on average
             lull_summary = subset_year_df.groupby('Position')['Pick Number'].agg(['min', 'mean', 'max']).reset_index()
             data_summary_text = lull_summary.to_string(index=False)
             
@@ -285,7 +278,13 @@ elif view_option == "Draft Position Lulls":
                 f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
             )
             with st.spinner("Analyzing drafting waves and valleys..."):
-                response = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
+                response = client.models.generate_content(
+                    model='gemini-3.7-flash', 
+                    contents=prompt,
+                    config=genai.types.GenerateContentConfig(
+                        thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
+                    )
+                )
                 st.write(response.text)
         except Exception as e:
             st.error(f"Could not load AI draft analysis: {str(e)}")
@@ -321,7 +320,6 @@ elif view_option == "Player Market Value":
     
     max_val = melted_players['Cap_Value_Percent'].max() * 1.1
     
-    # Plotly automatically adopts default light/dark backgrounds seamlessly!
     fig = px.bar(
         final_player_df,
         y='Player',
@@ -347,7 +345,6 @@ elif view_option == "Player Market Value":
     
     st.plotly_chart(fig, use_container_width=True)
 
-    # --- NEW FEATURE: INDIVIDUAL PLAYER MARKET AI SCOUT ---
     st.markdown("---")
     st.subheader(f"🤖 Gemini Player Value Audit ({selected_year} - {selected_position}s)")
     
@@ -357,7 +354,6 @@ elif view_option == "Player Market Value":
         st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
     else:
         try:
-            # Gather players with the widest price discrepancies
             audit_df = df_clean[(df_clean['Year'] == selected_year) & (df_clean['Position'] == selected_position)].copy()
             audit_df['Discrepancy'] = audit_df['Cap_Percent'] - audit_df['Consensus_AAV_Cap_Percent']
             
@@ -376,7 +372,13 @@ elif view_option == "Player Market Value":
                 f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
             )
             with st.spinner("Auditing individual player transaction ledgers..."):
-                response = client.models.generate_content(model='gemini-3.6-flash', contents=prompt)
+                response = client.models.generate_content(
+                    model='gemini-3.7-flash', 
+                    contents=prompt,
+                    config=genai.types.GenerateContentConfig(
+                        thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
+                    )
+                )
                 st.write(response.text)
         except Exception as e:
             st.error(f"Could not load player price audit: {str(e)}")
