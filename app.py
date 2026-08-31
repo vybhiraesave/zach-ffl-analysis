@@ -35,6 +35,23 @@ def load_and_clean_data():
     df['Year'] = df['Year'].astype(int)
     
     return df
+# ----------------------------------------------------
+# NEW FUNCTION: CACHED GEMINI ANALYSIS ENGINE
+# ----------------------------------------------------
+@st.cache_data(show_spinner=False)
+def get_cached_ai_analysis(api_key, prompt):
+    try:
+        client = genai.Client(api_key=api_key)
+        response = client.models.generate_content(
+            model='gemini-3.7-flash', 
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
+            )
+        )
+        return response.text
+    except Exception as e:
+        return f"Error connecting to the scouting network: {str(e)}"
 
 df_clean = load_and_clean_data()
 
@@ -199,9 +216,7 @@ elif view_option == "Manager Spending Habits":
         st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
     else:
         try:
-            data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
             client = genai.Client(api_key=api_key)
-            
             prompt = (
                 f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
                 f"Deconstruct this multi-year positional data for manager '{selected_manager}' regarding the '{selected_position}' position.\n"
@@ -214,14 +229,10 @@ elif view_option == "Manager Spending Habits":
             )
             
             with st.spinner("Analyzing high-stakes Superflex market patterns..."):
-                response = client.models.generate_content(
-                    model='gemini-3.7-flash', 
-                    contents=prompt,
-                    config=genai.types.GenerateContentConfig(
-                        thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
-                    )
-                )
-                st.write(response.text)
+                # CALLED THE NEW CACHED ENGINE HERE
+                analysis_text = get_cached_ai_analysis(api_key, prompt)
+                st.write(analysis_text)
+                
         except Exception as e:
             st.error(f"Scouting database connection timed out: {str(e)}")
             
@@ -278,16 +289,12 @@ elif view_option == "Draft Position Lulls":
                 f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
             )
             with st.spinner("Analyzing drafting waves and valleys..."):
-                response = client.models.generate_content(
-                    model='gemini-3.7-flash', 
-                    contents=prompt,
-                    config=genai.types.GenerateContentConfig(
-                        thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
-                    )
-                )
-                st.write(response.text)
+                # CALLED THE NEW CACHED ENGINE HERE
+                analysis_text = get_cached_ai_analysis(api_key, prompt)
+                st.write(analysis_text)
         except Exception as e:
             st.error(f"Could not load AI draft analysis: {str(e)}")
+
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -372,16 +379,12 @@ elif view_option == "Player Market Value":
                 f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
             )
             with st.spinner("Auditing individual player transaction ledgers..."):
-                response = client.models.generate_content(
-                    model='gemini-3.7-flash', 
-                    contents=prompt,
-                    config=genai.types.GenerateContentConfig(
-                        thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
-                    )
-                )
-                st.write(response.text)
+                # CALLED THE NEW CACHED ENGINE HERE
+                analysis_text = get_cached_ai_analysis(api_key, prompt)
+                st.write(analysis_text)
         except Exception as e:
             st.error(f"Could not load player price audit: {str(e)}")
+
 
 
 
