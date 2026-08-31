@@ -9,30 +9,12 @@ from google import genai
 # Set page configuration
 st.set_page_config(
     page_title="Zach's Auction Draft Analyzer",
-    page_icon="🦅",
+    page_icon="🏈",
     layout="wide"
 )
 
-# Custom Eagles Theme Colors
-EAGLES_GREEN = "#004C54"
-EAGLES_SILVER = "#A5ACAF"
-EAGLES_CHARCOAL = "#202224"
-EAGLES_BLACK = "#000000"
+# Using system defaults instead of forced custom colors to perfectly support Dark/Light mode!
 
-# Inject Custom CSS for Eagles Styling Accent
-st.markdown(f"""
-    <style>
-    .stApp {{
-        background-color: #F8FAFC;
-    }}
-    h1, h2, h3 {{
-        color: {EAGLES_GREEN} !important;
-    }}
-    .stSidebar {{
-        background-color: {EAGLES_CHARCOAL};
-    }}
-    </style>
-""", unsafe_allow_html=True)
 
 # ----------------------------------------------------
 # 1. DATA LOADING & CACHING
@@ -203,7 +185,7 @@ elif view_option == "Manager Spending Habits":
             hue='Cap_Metric',
             markers=True,
             dashes=[(1, 0), (2, 2)],
-            palette=[EAGLES_GREEN, EAGLES_SILVER], 
+            palette='tab10',  # Clean default multi-mode color system 
             linewidth=3,
             ax=ax
         )
@@ -267,7 +249,7 @@ elif view_option == "Draft Position Lulls":
         hue='Position',
         fill=True,
         common_norm=False,
-        palette='viridis',
+        palette='muted', # Clean theme-friendly palette
         linewidth=2,
         ax=ax
     )
@@ -277,6 +259,36 @@ elif view_option == "Draft Position Lulls":
     plt.grid(True, linestyle='--', alpha=0.5)
     
     st.pyplot(fig)
+
+    # --- NEW FEATURE: DRAFT LULL AI RADAR ANALYSIS ---
+    st.markdown("---")
+    st.subheader(f"🤖 Gemini AI Draft Flow Assessment ({selected_year})")
+    
+    api_key = st.secrets.get("GEMINI_API_KEY") or None
+    
+    if not api_key:
+        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic draft flow insights here.")
+    else:
+        try:
+            # Generate a summary string showing where each position was taken on average
+            lull_summary = subset_year_df.groupby('Position')['Pick Number'].agg(['min', 'mean', 'max']).reset_index()
+            data_summary_text = lull_summary.to_string(index=False)
+            
+            client = genai.Client(api_key=api_key)
+            prompt = (
+                f"You are a fantasy football data scientist studying draft economy curves. "
+                f"Analyze these draft distribution stats for the year {selected_year} detailing the pick numbers when positions went off the board:\n"
+                f"{data_summary_text}\n\n"
+                f"Provide a 3-sentence macro summary of the draft room environment.\n"
+                f"Sentence 1: Detail where the heaviest positional run took place based on the pick numbers.\n"
+                f"Sentence 2: Identify any obvious drafting lulls or windows where value dropped significantly.\n"
+                f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
+            )
+            with st.spinner("Analyzing drafting waves and valleys..."):
+                response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+                st.write(response.text)
+        except Exception as e:
+            st.error(f"Could not load AI draft analysis: {str(e)}")
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -309,6 +321,7 @@ elif view_option == "Player Market Value":
     
     max_val = melted_players['Cap_Value_Percent'].max() * 1.1
     
+    # Plotly automatically adopts default light/dark backgrounds seamlessly!
     fig = px.bar(
         final_player_df,
         y='Player',
@@ -317,7 +330,6 @@ elif view_option == "Player Market Value":
         orientation='h',
         barmode='group',
         hover_data=['Manager', 'Team', 'Pick Number', 'Amount'],
-        color_discrete_sequence=[EAGLES_GREEN, EAGLES_SILVER],
         labels={
             'Cap_Value_Percent': 'Cap Percentage (%)',
             'Player': 'Player Name',
@@ -334,6 +346,41 @@ elif view_option == "Player Market Value":
     )
     
     st.plotly_chart(fig, use_container_width=True)
+
+    # --- NEW FEATURE: INDIVIDUAL PLAYER MARKET AI SCOUT ---
+    st.markdown("---")
+    st.subheader(f"🤖 Gemini Player Value Audit ({selected_year} - {selected_position}s)")
+    
+    api_key = st.secrets.get("GEMINI_API_KEY") or None
+    
+    if not api_key:
+        st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic asset valuations here.")
+    else:
+        try:
+            # Gather players with the widest price discrepancies
+            audit_df = df_clean[(df_clean['Year'] == selected_year) & (df_clean['Position'] == selected_position)].copy()
+            audit_df['Discrepancy'] = audit_df['Cap_Percent'] - audit_df['Consensus_AAV_Cap_Percent']
+            
+            top_overpaid = audit_df.sort_values(by='Discrepancy', ascending=False).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
+            top_bargains = audit_df.sort_values(by='Discrepancy', ascending=True).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
+            
+            client = genai.Client(api_key=api_key)
+            prompt = (
+                f"You are a fantasy football financial ledger auditor reviewing an auction draft league. "
+                f"Analyze these top pricing anomalies for the position {selected_position} in the draft year {selected_year}.\n\n"
+                f"Top overpaid assets (Positive means they paid a huge premium above market value):\n{top_overpaid}\n\n"
+                f"Top bargain assets (Negative means they saved money below market value):\n{top_bargains}\n\n"
+                f"Provide a crisp 3-sentence economic teardown.\n"
+                f"Sentence 1: Highlight who the biggest overpayment was and why that manager compromised their budget economy.\n"
+                f"Sentence 2: Identify the best value bargain won in the room and the manager who secured it.\n"
+                f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
+            )
+            with st.spinner("Auditing individual player transaction ledgers..."):
+                response = client.models.generate_content(model='gemini-2.5-flash', contents=prompt)
+                st.write(response.text)
+        except Exception as e:
+            st.error(f"Could not load player price audit: {str(e)}")
+
 
 
 
