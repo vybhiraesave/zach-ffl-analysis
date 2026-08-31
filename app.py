@@ -6,40 +6,6 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from google import genai
 
-# ----------------------------------------------------
-# ERROR-PROOF FUNCTION: CACHED GEMINI ENGINE WITH STABLE 1.5 FALLBACK
-# ----------------------------------------------------
-@st.cache_data(show_spinner=False)
-def get_cached_ai_analysis(api_key, prompt):
-    client = genai.Client(api_key=api_key)
-    
-    # Attempt 1: Try the flagship model
-    try:
-        response = client.models.generate_content(
-            model='gemini-3.7-flash', 
-            contents=prompt,
-            config=genai.types.GenerateContentConfig(
-                thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
-            )
-        )
-        return response.text
-    except Exception as e:
-        # Check if the primary model is busy or hitting traffic capacity limits
-        if "503" in str(e) or "UNAVAILABLE" in str(e):
-            # Attempt 2: Instantly fall back to the rock-solid, long-term stable 1.5 tier
-            try:
-                fallback_response = client.models.generate_content(
-                    model='gemini-1.5-flash',
-                    contents=prompt + " (Note: Keep this analysis highly focused and concise.)"
-                )
-                return f"⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.* \n\n{fallback_response.text}"
-            except Exception as fallback_error:
-                return "The scouting network is completely congested right now. Please clear cache via the top-right menu and try again."
-        
-        # Pass standard validation or configuration errors normally
-        return f"Scouting report interrupted: {str(e)}"
-
-
 # Set page configuration
 st.set_page_config(
     page_title="Zach's Auction Draft Analyzer",
@@ -70,15 +36,50 @@ def load_and_clean_data():
     
     return df
 
+df_clean = load_and_clean_data()
+
 # ----------------------------------------------------
-# 2. SIDEBAR NAVIGATION & FILTERS
+# 2. RUNTIME ERROR INSURANCE: LOCK IN VARIABLES
 # ----------------------------------------------------
-st.sidebar.title("🏈 Auction Analysis Engine")
-st.sidebar.markdown("Analyzing historical draft inefficiencies to deliver a structural championship blueprint.")
+if df_clean.empty:
+    st.stop()
 
 all_years = sorted(df_clean['Year'].unique())
 all_positions = sorted(df_clean['Position'].unique())
 all_managers = sorted(df_clean['Manager'].unique())
+
+# ----------------------------------------------------
+# 3. RISK-PROOF GEMINI ENGINE WITH STABLE 1.5 FALLBACK
+# ----------------------------------------------------
+@st.cache_data(show_spinner=False)
+def get_cached_ai_analysis(api_key, prompt):
+    client = genai.Client(api_key=api_key)
+    try:
+        response = client.models.generate_content(
+            model='gemini-3.7-flash', 
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
+            )
+        )
+        return response.text
+    except Exception as e:
+        if "503" in str(e) or "UNAVAILABLE" in str(e):
+            try:
+                fallback_response = client.models.generate_content(
+                    model='gemini-1.5-flash',
+                    contents=prompt + " (Note: Keep this analysis highly focused and concise.)"
+                )
+                return f"⚠️ *Note: Primary server is busy. Switched to back-up stable 1.5 scout.* \n\n{fallback_response.text}"
+            except Exception as fallback_error:
+                return "The scouting network is completely congested right now. Please clear cache and try again."
+        return f"Scouting report interrupted: {str(e)}"
+
+# ----------------------------------------------------
+# 4. SIDEBAR NAVIGATION
+# ----------------------------------------------------
+st.sidebar.title("🏈 Auction Analysis Engine")
+st.sidebar.markdown("Analyzing historical draft inefficiencies to deliver a structural championship blueprint.")
 
 view_option = st.sidebar.radio(
     "Select Analysis View",
@@ -101,8 +102,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
         """)
     
     st.markdown("### 📈 Macro Trends & Manager Anomalies")
-    st.markdown("A unified analysis overview breaking down historical draft capital flow and tactical advantages.")
-
+    
     df_clean['Premium_Paid'] = df_clean['Cap_Percent'] - df_clean['Consensus_AAV_Cap_Percent']
     avg_premium_by_manager = df_clean.groupby('Manager')['Premium_Paid'].mean().reset_index()
     
@@ -118,9 +118,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
         st.metric(label="Top Value Exploiter", value=biggest_bargain_hunter, delta="Consistently Underbuys Market")
         
     st.markdown("---")
-    
     st.subheader("📊 Career Draft Capital Value Leaderboard")
-    st.markdown("This tracker displays the cumulative cap percentage saved (Bargain) or overpaid (Premium) by each manager across all drafted positions relative to consensus market rates.")
     
     roi_df = df_clean.groupby('Manager').agg(
         Total_Spent_Cap=('Cap_Percent', 'sum'),
@@ -140,7 +138,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
     
     c1, c2, c3 = st.columns(3)
     with c1:
-        st.markdown(f"#### 🔍 Key Manager Behaviors")
+        st.markdown("#### 🔍 Key Manager Behaviors")
         st.markdown(
             f"• **{most_aggressive}** repeatedly resets positional markets by driving premium asset prices significantly above baseline consensus AAV.\n"
             f"• **{biggest_bargain_hunter}** systematically drops out of early-round bidding runs, waiting for late-draft drops where visual inflation resets.\n"
@@ -150,7 +148,7 @@ if view_option == "Executive Blueprint (2026 Plan)":
         st.markdown("#### 📉 Positional Market Trends")
         st.markdown(
             "• **Quarterbacks (QB):** Due to the Superflex structure, early tiers face massive inflationary bidding curves. The mid-tier values are consistently squeezed.\n"
-            f"• **Running Backs & Wide Receivers:** Highly volatile valleys exist between pick ranges 35-70 where league draft velocity cools down significantly.\n"
+            "• **Running Backs & Wide Receivers:** Highly volatile valleys exist between pick ranges 35-70 where league draft velocity cools down significantly.\n"
             "• **Tight Ends (TE):** Consistently draft below international consensus values unless targeting the elite top-3 overall stars."
         )
     with c3:
@@ -228,10 +226,7 @@ elif view_option == "Manager Spending Habits":
         st.info("💡 Add your `GEMINI_API_KEY` to app Secrets to activate live dynamic scouting reports here.")
     else:
         try:
-            # FIX: Added this line back to define the data text for Gemini
             data_summary_text = subset_df[['Year', 'Total_Cap_Percent', 'Total_Consensus_AAV_Cap_Percent']].to_string(index=False)
-            
-            client = genai.Client(api_key=api_key)
             prompt = (
                 f"You are a sharp, elite fantasy football analytics expert specializing in high-stakes Superflex auction leagues. "
                 f"Deconstruct this multi-year positional data for manager '{selected_manager}' regarding the '{selected_position}' position.\n"
@@ -247,13 +242,11 @@ elif view_option == "Manager Spending Habits":
                 analysis_text = get_cached_ai_analysis(api_key, prompt)
                 st.write(analysis_text)
         except Exception as e:
-            st.error(f"Scouting database connection timed out: {str(e)}")
+            st.error(f"Scouting database connection error: {str(e)}")
 
-        except Exception as e:
-            st.error(f"Scouting database connection timed out: {str(e)}")
-            
     with st.expander("View Filtered Spreadsheet Breakdown"):
         st.dataframe(subset_df, use_container_width=True)
+
 # ----------------------------------------------------
 # VIEW 2: DRAFT POSITION LULLS
 # ----------------------------------------------------
@@ -294,7 +287,6 @@ elif view_option == "Draft Position Lulls":
             lull_summary = subset_year_df.groupby('Position')['Pick Number'].agg(['min', 'mean', 'max']).reset_index()
             data_summary_text = lull_summary.to_string(index=False)
             
-            client = genai.Client(api_key=api_key)
             prompt = (
                 f"You are a fantasy football data scientist studying draft economy curves. "
                 f"Analyze these draft distribution stats for the year {selected_year} detailing the pick numbers when positions went off the board:\n"
@@ -305,12 +297,10 @@ elif view_option == "Draft Position Lulls":
                 f"Sentence 3: Provide a distinct tactical rule of thumb for exploiting this dynamic in future drafts. Keep it scannable with bold highlights."
             )
             with st.spinner("Analyzing drafting waves and valleys..."):
-                # CALLED THE NEW CACHED ENGINE HERE
                 analysis_text = get_cached_ai_analysis(api_key, prompt)
                 st.write(analysis_text)
         except Exception as e:
             st.error(f"Could not load AI draft analysis: {str(e)}")
-
 
 # ----------------------------------------------------
 # VIEW 3: PLAYER MARKET VALUE
@@ -383,7 +373,6 @@ elif view_option == "Player Market Value":
             top_overpaid = audit_df.sort_values(by='Discrepancy', ascending=False).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
             top_bargains = audit_df.sort_values(by='Discrepancy', ascending=True).head(2)[['Player', 'Manager', 'Discrepancy']].to_string(index=False)
             
-            client = genai.Client(api_key=api_key)
             prompt = (
                 f"You are a fantasy football financial ledger auditor reviewing an auction draft league. "
                 f"Analyze these top pricing anomalies for the position {selected_position} in the draft year {selected_year}.\n\n"
@@ -395,13 +384,9 @@ elif view_option == "Player Market Value":
                 f"Sentence 3: Outline a pricing strategy warning for handling this player tier in future draft rooms based on these behaviors. Use bold text elements."
             )
             with st.spinner("Auditing individual player transaction ledgers..."):
-                # CALLED THE NEW CACHED ENGINE HERE
                 analysis_text = get_cached_ai_analysis(api_key, prompt)
                 st.write(analysis_text)
         except Exception as e:
             st.error(f"Could not load player price audit: {str(e)}")
-
-
-
 
 
