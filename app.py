@@ -6,6 +6,40 @@ import seaborn as sns
 import matplotlib.pyplot as plt
 from google import genai
 
+# ----------------------------------------------------
+# ERROR-PROOF FUNCTION: CACHED GEMINI ENGINE WITH STABLE 1.5 FALLBACK
+# ----------------------------------------------------
+@st.cache_data(show_spinner=False)
+def get_cached_ai_analysis(api_key, prompt):
+    client = genai.Client(api_key=api_key)
+    
+    # Attempt 1: Try the flagship model
+    try:
+        response = client.models.generate_content(
+            model='gemini-3.7-flash', 
+            contents=prompt,
+            config=genai.types.GenerateContentConfig(
+                thinking_config=genai.types.ThinkingConfig(thinking_level="MEDIUM")
+            )
+        )
+        return response.text
+    except Exception as e:
+        # Check if the primary model is busy or hitting traffic capacity limits
+        if "503" in str(e) or "UNAVAILABLE" in str(e):
+            # Attempt 2: Instantly fall back to the rock-solid, long-term stable 1.5 tier
+            try:
+                fallback_response = client.models.generate_content(
+                    model='gemini-1.5-flash',
+                    contents=prompt + " (Note: Keep this analysis highly focused and concise.)"
+                )
+                return f"⚠️ *Note: Primary server is busy. Switched to back-up 1.5 scout.* \n\n{fallback_response.text}"
+            except Exception as fallback_error:
+                return "The scouting network is completely congested right now. Please clear cache via the top-right menu and try again."
+        
+        # Pass standard validation or configuration errors normally
+        return f"Scouting report interrupted: {str(e)}"
+
+
 # Set page configuration
 st.set_page_config(
     page_title="Zach's Auction Draft Analyzer",
