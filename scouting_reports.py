@@ -21,7 +21,7 @@ When high-tier early QB runs ignite the auction room, Bryan displays a **bimodal
 ### **The QB-Squeeze & TE-Tax Execution Plan**
 
 *   **Rule 1: Force the QB Binary Trap.** Early in the auction, nominate Tier-2/high-end Superflex QBs immediately after the elite Tier-1 QBs drop. Bid these QBs up to **35%–40% of cap** to eliminate his ability to acquire cheap consensus value. This forces Bryan into an unviable choice: **either break his rule by overpaying for QB market value, or force him back into a broken 6% Punt QB build.**
-*   **Rule 2: Enforce the $3 TE Tax.** Knowing Bryan hard-caps his TE expenditure at **exactly 2%**, nominate high-upside $1-$2 TEs late in the draft. **Nominate and automatically bid them to 3% cap ($3 on a $100 budget).** Because his threshold is strictly locked at 2%, this price-enforcement tactic completely blocks him from his preferred baseline TE targets, forcing him onto zero-dollar waiver assets or disrupting his roster construction.
+*   **Rule 2: Enforce the \$3 TE Tax.** Knowing Bryan hard-caps his TE expenditure at **exactly 2%**, nominate high-upside \$1-\$2 TEs late in the draft. **Nominate and automatically bid them to 3% cap (\$3 on a \$100 budget).** Because his threshold is strictly locked at 2%, this price-enforcement tactic completely blocks him from his preferred baseline TE targets, forcing him onto zero-dollar waiver assets or disrupting his roster construction.
 *   **Rule 3: Inflate High-End WR2s.** Bryan relies on getting surplus value at WR to anchor his roster (~50% spend). **Nominate elite WR2s early and drive bidding to match their exact Consensus AAV.** Stripping his 5–6% WR surplus buffer starves his roster of its primary efficiency engine.""",
 
     "Christian": """### 🎯 Positional Value Blueprint
@@ -40,7 +40,7 @@ When high-tier early QB runs ignite the auction room, Bryan displays a **bimodal
 
 *   **Tight End (TE): Total Punt / Minimum Spend**
     *   **Behavior:** Christian has completely phased out TE spending, moving from a modest 12% in 2021 down to a systematic punt of **1% in 2025**.
-    *   **Valuation Strategy:** **Pure bargain bin.** He will not spend above $1–$3 for a tight end and treats the position as entirely streamable/disposable.
+    *   **Valuation Strategy:** **Pure bargain bin.** He will not spend above \$1–\$3 for a tight end and treats the position as entirely streamable/disposable.
 
 ---
 
@@ -147,9 +147,9 @@ Because he anchors his cap into RBs (or WRs in 2024), he relies on the QB run co
 
 James’s entire structural build relies on **price discipline at QB** funding his **heavy RB stack**. To dismantle his build, execute this exact price-enforcement trap:
 
-*   **The Price-Enforcement Rule:** **Price-enforce any Tier-2/3 QB James bids on up to $0.85 \times \text{Consensus AAV}$.** 
+*   **The Price-Enforcement Rule:** **Price-enforce any Tier-2/3 QB James bids on up to \$0.85 \times \text{Consensus AAV}\$.** 
 *   **Execution:** Nominate mid-to-high Tier-2 QBs early during the initial run. Do not let James sit back and collect QB surplus at a 20%+ discount. Force him into one of two fatal structural traps:
-    1.  **Over-allocation Trap:** Force him to pay full consensus price (**$\ge$28–32% Cap**) for his QBs, directly starving his primary strategy of dropping **40%+ Cap on RBs**.
+    1.  **Over-allocation Trap:** Force him to pay full consensus price (**\$\ge\$28–32% Cap**) for his QBs, directly starving his primary strategy of dropping **40%+ Cap on RBs**.
     2.  **Roster Deficit Trap:** If he refuses to match bids past his preferred discount threshold, he will be forced into starting bottom-tier QBs in a 10-team Superflex format, crippling his weekly point baseline.""",
 
     "Joey": """### 🎯 Positional Value Blueprint
@@ -171,7 +171,7 @@ When high-tier QB bidding wars ignite early in the draft, Joey’s structural re
 
 Rather than matching the market inflation for Tier 1 Superflex assets, Joey routinely folds his hand early during elite QB runs, opting to let competitors drain their budget reserves. He takes the cap saved by bowing out of the elite QB race and immediately reallocates it into non-QB premium tiers (primarily elite RBs or WR depth). 
 
-His psychological flaw is **deliberate delayed gratification at QB2/SF**: he assumes he can piece together viable QB output through late-draft $1-$5 bargains or low-AAV vet placeholders. The only time he broke this tendency was in 2022—paying 34% cap on QB after finishing 2021 with a bottom-barrel 4% QB footprint—proving that he only enters high-tier QB runs when forced by severe recency bias from a prior season failure.
+His psychological flaw is **deliberate delayed gratification at QB2/SF**: he assumes he can piece together viable QB output through late-draft \$1-\$5 bargains or low-AAV vet placeholders. The only time he broke this tendency was in 2022—paying 34% cap on QB after finishing 2021 with a bottom-barrel 4% QB footprint—proving that he only enters high-tier QB runs when forced by severe recency bias from a prior season failure.
 
 ---
 
@@ -180,7 +180,7 @@ His psychological flaw is **deliberate delayed gratification at QB2/SF**: he ass
 To exploit Joey\'s distinct bidding pattern in 2026, execute the following strategy:
 
 *   **The 2026 RB Pendulum Trap**: Historically, whenever Joey under-allocates cap to the RB position in Year $N$ (e.g., 2022 at 18%, 2025 at 29%), he aggressively over-corrects in Year $N+1$ (e.g., 2023 at 40%, 2024 at 51%). **Nominate elite, high-consensus RBs in the first 10 calls of the auction.** Force Joey into his predictable over-correction phase early so he burns **>45% of his total cap** on 1–2 RBs.
-*   **Price-Enforce Mid-Tier QBs**: Because Joey attempts to buy low-end QB1s/high-end QB2s at steep discounts (-8% to -11% relative to consensus AAV), **never allow him to win mid-tier QBs at baseline bids**. Consistently bid him up to exact consensus AAV on QBs in the $12–$22 range. This forces him to either:
+*   **Price-Enforce Mid-Tier QBs**: Because Joey attempts to buy low-end QB1s/high-end QB2s at steep discounts (-8% to -11% relative to consensus AAV), **never allow him to win mid-tier QBs at baseline bids**. Consistently bid him up to exact consensus AAV on QBs in the \$12–\$22 range. This forces him to either:
     1. Overpay beyond his comfort zone, destroying his target WR/RB allocation budget.
     2. Completely abandon the tier, stranding him with sub-5% cap efficiency at the Superflex position.""",
 
@@ -189,7 +189,7 @@ To exploit Joey\'s distinct bidding pattern in 2026, execute the following strat
 * **Quarterbacks (QBs) — *Bargain Hunter / SF Minimalist***: Louis systematically under-invests in QB capital relative to Superflex standards, capping spend between 10% and 21%. He avoids top-tier QB bidding wars entirely, preferring to target deep market crashes where he can acquire massive consensus value at half-price (evidenced in 2025: acquiring **36% consensus value for just 17% cap spend**).
 * **Running Backs (RBs) — *Cyclical Swing Trader***: Highly volatile spending pattern. He alternates between heavy allocations (40%–50% in 2021–2022, 48% in 2025) and absolute Zero-RB builds (14% in 2024). He overpays when pivoting back into the market (paid **+11% over consensus** in 2025).
 * **Wide Receivers (WRs) — *Anchor Engine / Premium Spender***: WR is the centerpiece of his build strategy. He allocated between 40% and 72% of his cap to WRs from 2022–2024, consistently paying full market rate or slight premiums to hoard top-tier talent.
-* **Tight Ends (TEs) — *Strict Punt Strategy***: After overpaying for TE in 2021 (14%), Louis permanently shifted to a absolute punt strategy. From 2022–2025, he allocated a strict **2% to 4% cap limit**, quietly picking up fallen 7%–11% market consensus TEs on nominal $1–$3 bids.
+* **Tight Ends (TEs) — *Strict Punt Strategy***: After overpaying for TE in 2021 (14%), Louis permanently shifted to a absolute punt strategy. From 2022–2025, he allocated a strict **2% to 4% cap limit**, quietly picking up fallen 7%–11% market consensus TEs on nominal \$1–\$3 bids.
 
 ---
 
@@ -205,7 +205,7 @@ To exploit Joey\'s distinct bidding pattern in 2026, execute the following strat
 
 **Rule: Force price-enforcement on Tier-2/Tier-3 QBs and front-load his WR nominations.**
 
-* **The Mid-Tier QB Squeeze**: Because Louis relies on capturing high QB consensus value at a fraction of the cost, do not let mid-tier QBs fall to dollar values. **Set a hard bidding rule to price-enforce all Tier-2/3 QBs to at least 80% of Consensus AAV when Louis is in the bidding window.** Forcing him to pay $20+ instead of $10 for his QB2 breaks his cap allocation model.
+* **The Mid-Tier QB Squeeze**: Because Louis relies on capturing high QB consensus value at a fraction of the cost, do not let mid-tier QBs fall to dollar values. **Set a hard bidding rule to price-enforce all Tier-2/3 QBs to at least 80% of Consensus AAV when Louis is in the bidding window.** Forcing him to pay \$20+ instead of \$10 for his QB2 breaks his cap allocation model.
 * **The WR Liquidity Trap**: Nominate his favorite target WRs in the first 5 nominations before QB cash leaves the board. Force Louis to pay **>45% cap on a single anchor WR** early; this permanently prevents him from executing his cyclical RB rebounds or vacuuming up draft-day fallen assets late.""",
 
     "Zach": """### 🎯 Positional Value Blueprint
@@ -237,11 +237,11 @@ To exploit Joey\'s distinct bidding pattern in 2026, execute the following strat
 Zach’s current model relies on extracting elite **RB Surplus Value** during late-round budget exhaustion while maintaining a **Hero/Double-Anchor QB strategy**. To dismantle his system, execute the following protocols:
 
 1.  **The RB Price-Floor Rule (Choke His Surplus):**  
-    Zach\'s edge relies on getting $40+ consensus RBs for $25. **Never allow Zach to acquire any RB at more than a 15% discount off Consensus AAV.** If an elite RB\'s bidding stalls at 25% cap spend and Zach is the high bidder, bid him up to **at least 80% of the player\'s consensus value**. Forcing him to pay full market price on RBs breaks his roster math.
+    Zach\'s edge relies on getting \$40+ consensus RBs for \$25. **Never allow Zach to acquire any RB at more than a 15% discount off Consensus AAV.** If an elite RB\'s bidding stalls at 25% cap spend and Zach is the high bidder, bid him up to **at least 80% of the player\'s consensus value**. Forcing him to pay full market price on RBs breaks his roster math.
 2.  **Early RB Nomination Trap:**  
     Nominate top-12 consensus RBs within the **first 5 nominations** of the auction. Because Zach prefers to lock in his QB capital first before bargain-hunting RBs, early RB nominations force him into an uncomfortable choice: either break his structural cadence by bidding early on RBs, or let top RB talent leave the board before he can buy them at a discount.
 3.  **Force the TE Tax:**  
-    Zach routinely punts TE down to 2% ($2-$4) to subsidize his QB/WR/RB depth. Nominate upper-mid tier TEs (TE6–TE10) early for $3–$5. Force Zach to spend $5+ to secure a viable starter, or trap him into taking $1 zero-floor scrubs that guarantee a functional point-deficit at the position every week.""",
+    Zach routinely punts TE down to 2% (\$2-\$4) to subsidize his QB/WR/RB depth. Nominate upper-mid tier TEs (TE6–TE10) early for \$3–\$5. Force Zach to spend \$5+ to secure a viable starter, or trap him into taking \$1 zero-floor scrubs that guarantee a functional point-deficit at the position every week.""",
 
     "Mike": """### 🎯 Positional Value Blueprint
 
@@ -267,7 +267,7 @@ To exploit Mike\'s rigid positional anchoring and predictable bidding mechanics,
 
 *   **The Early RB Tax:** Nominate high-end Tier-1/Tier-2 RBs within the first 5 picks of the auction. Mike cannot resist securing his RB anchor and will routinely bid up to **5%–9% over consensus AAV** early when his total bankroll is intact. Force him to lock up **>50% of his budget** on RBs immediately.
 *   **The Mid-Tier QB Trap Rule:** During an early SF QB run, **nominate Tier-2/3 QBs immediately after the elite tier clears**. Mike’s historical data proves he will overbid consensus by **+6% to +8%** to secure a starting QB out of panic. 
-*   **Execution:** Bid Mike up on mid-tier QBs to the **18%–20% cap threshold** (where his consensus value usually caps at ~13%), then **walk away instantly**. This locks Mike into a broken build structure: an overpaid mid-tier QB, an overpaid RB room, and **<$15% total remaining budget** to fill out his WRs and TEs, leaving him completely vulnerable at depth.""",
+*   **Execution:** Bid Mike up on mid-tier QBs to the **18%–20% cap threshold** (where his consensus value usually caps at ~13%), then **walk away instantly**. This locks Mike into a broken build structure: an overpaid mid-tier QB, an overpaid RB room, and **<\$15% total remaining budget** to fill out his WRs and TEs, leaving him completely vulnerable at depth.""",
 
     "Tyler": """### 🎯 Positional Value Blueprint
 
