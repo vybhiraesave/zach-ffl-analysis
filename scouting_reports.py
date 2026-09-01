@@ -184,12 +184,115 @@ To exploit Joey\'s distinct bidding pattern in 2026, execute the following strat
     1. Overpay beyond his comfort zone, destroying his target WR/RB allocation budget.
     2. Completely abandon the tier, stranding him with sub-5% cap efficiency at the Superflex position.""",
 
-    "Louis": """AI lookup unavailable for this profile portfolio entry.""",
+    "Louis": """### 🎯 Positional Value Blueprint
 
-    "Mike": """AI lookup unavailable for this profile portfolio entry.""",
+* **Quarterbacks (QBs) — *Bargain Hunter / SF Minimalist***: Louis systematically under-invests in QB capital relative to Superflex standards, capping spend between 10% and 21%. He avoids top-tier QB bidding wars entirely, preferring to target deep market crashes where he can acquire massive consensus value at half-price (evidenced in 2025: acquiring **36% consensus value for just 17% cap spend**).
+* **Running Backs (RBs) — *Cyclical Swing Trader***: Highly volatile spending pattern. He alternates between heavy allocations (40%–50% in 2021–2022, 48% in 2025) and absolute Zero-RB builds (14% in 2024). He overpays when pivoting back into the market (paid **+11% over consensus** in 2025).
+* **Wide Receivers (WRs) — *Anchor Engine / Premium Spender***: WR is the centerpiece of his build strategy. He allocated between 40% and 72% of his cap to WRs from 2022–2024, consistently paying full market rate or slight premiums to hoard top-tier talent.
+* **Tight Ends (TEs) — *Strict Punt Strategy***: After overpaying for TE in 2021 (14%), Louis permanently shifted to a absolute punt strategy. From 2022–2025, he allocated a strict **2% to 4% cap limit**, quietly picking up fallen 7%–11% market consensus TEs on nominal $1–$3 bids.
 
-    "Tyler": """AI lookup unavailable for this profile portfolio entry.""",
+---
 
-    "Zach": """AI lookup unavailable for this profile portfolio entry.""",
+### ⚡ Superflex Run Tendencies
+
+* **Immediate Capital Retreat**: When early high-tier QB runs strike the room, Louis structurally refuses to engage. Rather than paying competitive rates for elite QBs, he completely yields the tier to room competitors.
+* **Skill Position Exploitation**: As rivals bleed capital competing for QBs, Louis exploits room illiquidity by hoarding elite WRs and RBs at or below market value (e.g., dropping 72% on WRs in 2024 while the room chased QBs).
+* **Late-Run Scavenging**: He waits for QB auction liquidity to dry up completely, stepping in at the tail-end of quarterback runs to buy fallen QB2/QB3 assets at steep discounts against consensus AAV.
+
+---
+
+### 🛡️ 2026 Counter-Strategy
+
+**Rule: Force price-enforcement on Tier-2/Tier-3 QBs and front-load his WR nominations.**
+
+* **The Mid-Tier QB Squeeze**: Because Louis relies on capturing high QB consensus value at a fraction of the cost, do not let mid-tier QBs fall to dollar values. **Set a hard bidding rule to price-enforce all Tier-2/3 QBs to at least 80% of Consensus AAV when Louis is in the bidding window.** Forcing him to pay $20+ instead of $10 for his QB2 breaks his cap allocation model.
+* **The WR Liquidity Trap**: Nominate his favorite target WRs in the first 5 nominations before QB cash leaves the board. Force Louis to pay **>45% cap on a single anchor WR** early; this permanently prevents him from executing his cyclical RB rebounds or vacuuming up draft-day fallen assets late.""",
+
+    "Zach": """### 🎯 Positional Value Blueprint
+
+*   **Quarterback (QB): Premium Anchor / Value Pivot**  
+    Zach treats QB as his roster\'s core engine, rarely dropping below ~30% budget allocation (peaking at 42% in 2021 and 2025). Early in his history (2021), he overpaid drastically (42% spend for 25% consensus value). However, he has evolved into a disciplined buyer who now secures high-end QB assets either at cost (2025: 42% spend / 42% value) or at steep discounts (2024: 33% spend / 42% value).
+*   **Running Back (RB): Dynamic Bargain Hunter**  
+    Zach’s biggest competitive advantage is capturing massive surplus value at RB in mature years. While he overpaid early on (2021, 2023), his modern strategy (2022, 2024, 2025) aggressively hunts market crashes. In 2025, he captured **45% consensus cap value while spending only 25% of his actual budget**, leveraging room inefficiency to snag tier-1/2 RBs at a discounted rate.
+*   **Wide Receiver (WR): High-Floor Foundation**  
+    Zach consistently allocates 22%–35% of his cap to WRs. He avoids emotional bidding here, almost always capturing a positive surplus ROI (e.g., 2024: 35% spend for 39% value; 2025: 33% spend for 37% value). He views WR as a steady value accumulator rather than a place to hero-spend.
+*   **Tight End (TE): Extreme Punter (With Rare Opportunistic Spikes)**  
+    With the exception of a massive 2023 outlier (25% spend for an elite TE anchor), Zach operates as a hard TE punter. In 2021, 2024, and 2025, he allocated 2%–5% of his cap to the position, treating TE as a zero-cost, streaming-level slot to maximize cap spend across QB/RB/WR.
+
+---
+
+### ⚡ Superflex Run Tendencies
+
+*   **Early Career (2021): Panic Overpay**  
+    When early QB runs occurred in 2021, Zach exhibited severe FOMO, spending 42% of his total draft capital on a QB room that the market evaluated at only 25% consensus AAV. 
+*   **Modern Strategy (2024–2025): Market Counter-Cyclist**  
+    Zach has completely inverted his psychological response to Superflex runs:
+    1.  **If he buys during a run:** He only strikes if he gets surplus value (2024: 33% spend vs. 42% value) or fair top-tier cost (2025: 42% spend vs. 42% value).
+    2.  **If the room over-bids on QBs:** He halts his QB bidding and turns the run into a weapon. While the other 9 managers drain their capital competing for QBs, Zach pivots to mop up elite RBs and WRs dropping below consensus. In 2025, while the room overspent on QB runs, Zach quietly extracted a **+20% surplus spread on RBs** (25% spend for 45% value).
+
+---
+
+### 2026 Counter-Strategy
+
+Zach’s current model relies on extracting elite **RB Surplus Value** during late-round budget exhaustion while maintaining a **Hero/Double-Anchor QB strategy**. To dismantle his system, execute the following protocols:
+
+1.  **The RB Price-Floor Rule (Choke His Surplus):**  
+    Zach\'s edge relies on getting $40+ consensus RBs for $25. **Never allow Zach to acquire any RB at more than a 15% discount off Consensus AAV.** If an elite RB\'s bidding stalls at 25% cap spend and Zach is the high bidder, bid him up to **at least 80% of the player\'s consensus value**. Forcing him to pay full market price on RBs breaks his roster math.
+2.  **Early RB Nomination Trap:**  
+    Nominate top-12 consensus RBs within the **first 5 nominations** of the auction. Because Zach prefers to lock in his QB capital first before bargain-hunting RBs, early RB nominations force him into an uncomfortable choice: either break his structural cadence by bidding early on RBs, or let top RB talent leave the board before he can buy them at a discount.
+3.  **Force the TE Tax:**  
+    Zach routinely punts TE down to 2% ($2-$4) to subsidize his QB/WR/RB depth. Nominate upper-mid tier TEs (TE6–TE10) early for $3–$5. Force Zach to spend $5+ to secure a viable starter, or trap him into taking $1 zero-floor scrubs that guarantee a functional point-deficit at the position every week.""",
+
+    "Mike": """### 🎯 Positional Value Blueprint
+
+*   **Quarterbacks (QB): Reacher / Volatile Split.** Mike does not buy QBs at discount. When he spends, he routinely pays **premium rates over consensus AAV** (e.g., 31% spend vs. 23% market in 2022; 19% spend vs. 13% market in 2025). When prices escalate beyond his comfort zone, he executes an extreme punt (8% in 2024).
+*   **Running Backs (RB): Premium Core Anchor.** RB is Mike’s non-negotiable priority, averaging **46.8% of his total cap** over 5 years. He consistently pays full market price or a distinct premium (55% vs. 49% in 2024; 51% vs. 42% in 2025) to secure dominant RB rooms.
+*   **Wide Receivers (WR): Residual Bargain Hunter.** WR investment is completely dependent on his QB spend. He never pays a premium here; he exclusively **hunts deep value discounts** (e.g., acquiring 35% consensus value for just 21% cap in 2025) or punts the position entirely (7% in 2023) to fund his QB/RB anchors.
+*   **Tight Ends (TE): Binary Extreme Punt.** Punts TE in 60% of drafts at a strict **2% budget floor**. He only invests (12–13%) when mid-tier options fall precisely at or below consensus market value.
+
+---
+
+### ⚡ Superflex Run Tendencies
+
+When high-tier QB runs strike early in the draft room, Mike exhibits two sharp psychological pivots:
+
+1.  **The Overpay Chaser (Panic Bidding):** If Mike attempts to keep pace with an early run without landing a true Tier-1 superstar, he gets anchor-biased and overpays for Tier-2/3 QBs. In 2021, 2022, and 2025, his actual spend exceeded consensus market value by **+6% to +8% of cap** as he aggressively bid up mid-tier signal-callers to avoid getting left behind.
+2.  **The Total Hard Pivot (Bailout Mechanism):** If the top QBs price him out completely early on, Mike psychologically breaks away from the run entirely. As seen in 2024, he capped his QB spend at a meager **8%** (buying 12% consensus value) and redirected **95% of his total cap into RB and WR**, attempting to overwhelm the room at skill positions while running out bargain-bin QBs in Superflex.
+
+---
+
+### 🛡️ 2026 Counter-Strategy
+
+To exploit Mike\'s rigid positional anchoring and predictable bidding mechanics, execute the following strategy:
+
+*   **The Early RB Tax:** Nominate high-end Tier-1/Tier-2 RBs within the first 5 picks of the auction. Mike cannot resist securing his RB anchor and will routinely bid up to **5%–9% over consensus AAV** early when his total bankroll is intact. Force him to lock up **>50% of his budget** on RBs immediately.
+*   **The Mid-Tier QB Trap Rule:** During an early SF QB run, **nominate Tier-2/3 QBs immediately after the elite tier clears**. Mike’s historical data proves he will overbid consensus by **+6% to +8%** to secure a starting QB out of panic. 
+*   **Execution:** Bid Mike up on mid-tier QBs to the **18%–20% cap threshold** (where his consensus value usually caps at ~13%), then **walk away instantly**. This locks Mike into a broken build structure: an overpaid mid-tier QB, an overpaid RB room, and **<$15% total remaining budget** to fill out his WRs and TEs, leaving him completely vulnerable at depth.""",
+
+    "Tyler": """### 🎯 Positional Value Blueprint
+
+*   **Quarterback (Price-Sensitive Opportunist):** Tyler treats QB as a volatile asset class rather than an untouchable foundation. Outside of 2021 (23% spent vs. 16% consensus), he systematically **hunts bargains** and underpays relative to market value—spending 8% below consensus in 2023 (29% vs. 38%) and 12% below in 2025 (16% vs. 28%). When market prices surge, he routinely under-indexes or completely punts the position (allocating a mere 6% in 2022).
+*   **Running Back (Premium Anchor Investment):** RBs are Tyler’s non-negotiable structural priority. He **pays premium rates** and commands high capital allocation, averaging over 41% of total cap across five years (peaking at 50% in 2021 and 45% in 2025). He rarely shies away from top-tier RB spending, consistently matching or dictating the market standard.
+*   **Wide Receiver (High-Volume Discount Hunter):** Tyler commits strong budget share to WRs (24% to 40% cap), but refuses to pay full retail price. He is an elite **bargain hunter** at the position, consistently acquiring high consensus value at steep discounts—most notably in 2025, where he secured 56% worth of consensus AAV value for just 36% of actual cap.
+*   **Tight End (Systematic Punter):** Tyler treats TE as a **pure punt position** in 3 out of 5 seasons (spending 2%–3% cap in 2021, 2024, and 2025). He only commits real capital (12%–15% in 2022–2023) when high-tier consensus value falls directly into his price range, but defaults to minimum-bid placeholder strategies.
+
+---
+
+### ⚡ Superflex Run Tendencies
+
+When elite Superflex QB runs strike early in the auction, Tyler **refuses to engage in bidding wars**. His structural psychology is defined by disciplined risk-aversion and capital preservation during elite positional panics:
+
+1.  **Bail and Pivot:** Rather than overpaying during an aggressive QB bidding spree, Tyler immediately steps back and lets room inflation drain opponents\' budgets. 
+2.  **Capital Redirection:** He redirects preserved capital directly into the RB/WR market, securing high-tier skill-position players while the room is liquidity-starved (explaining his massive 42%–45% RB footprints during low QB spend years like 2022 and 2025).
+3.  **Late-Tier Floor Sweeping:** He waits for the run to collapse, buying Tier 3/4 QBs or high-variance starters at deep discounts relative to consensus AAV (evidenced by his 2025 draft: 16% actual spent vs. 28% consensus expected).
+
+---
+
+### 🛡️ 2026 Counter-Strategy
+
+Exploit Tyler’s predictable capital allocation and price sensitivity using the following tactical rules:
+
+*   **The Early RB Tax Trap:** Nominate Tier 1/2 RBs immediately at the start of the draft. Because Tyler views RB as his structural anchor (consistently burning **40%+ cap**), bid-force him up to **110%–115% of Consensus AAV**. He will stubbornly take the bait to secure his core build, draining his liquidity early and neutralizing his ability to hunt WR bargains later.
+*   **The QB Pivot Squeeze Rule:** If an early QB run starts, **do not let Tyler escape to the mid-tier discount bin**. As soon as top-tier QBs clear, immediately nominate mid-tier QBs (QB12–QB20 range) and push bids up to **90%–95% of Consensus AAV**. Because Tyler’s psychological hard ceiling forces him to abandon QBs when they hit market rate (spending **8%–12% under consensus QB AAV** in run years), price-enforcing this range forces him into a critical failure state: **either force him to overpay out of his comfort zone or trap him into entering the season severely compromised at Superflex (sub-10% QB cap allocation).**""",
 
 }
